@@ -1,11 +1,12 @@
 from flask import Flask, request, jsonify, render_template
 import requests
 import datetime
+import os
 
 app = Flask(__name__)
 
-# --- CONFIG ---
-API_KEY = "AIzaSyCu-F44_ZunbgwXnB9JcmzCJIqLu1-EGDM" 
+# --- Nayi API Key Fit Kar Di Hai ---
+API_KEY = "AQ.Ab8RN6IGj2GFh9UqgyQqo0f25_fBo-ajRlk5pMYeWXqdXPDAOQ" 
 
 @app.route('/')
 def home():
@@ -18,29 +19,35 @@ def ask():
     
     aaj_ki_date = datetime.datetime.now().strftime("%d %B %Y")
     
-    # Ekdum simple structure taaki connection fast ho
+    # URL for Gemini 1.5 Flash (Super Stable)
     url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={API_KEY}"
     
+    # Clean Payload structure for Render Cloud
     payload = {
         "contents": [{
-            "parts": [{"text": f"Date: {aaj_ki_date}. User says: {user_query}. Respond as Jarvis in Hinglish."}]
+            "parts": [{"text": f"Today is {aaj_ki_date}. You are J.A.R.V.I.S., a witty and smart AI assistant for a UPSC/Defense aspirant. Answer the user in Hinglish: {user_query}"}]
         }]
     }
     
     try:
-        # Timeout badha kar 30 seconds kar diya hai
-        res = requests.post(url, json=payload, timeout=30)
+        # Increase timeout to 40 seconds to handle Render's slower network
+        res = requests.post(url, json=payload, timeout=40)
         response_data = res.json()
         
         if 'candidates' in response_data:
             bot_reply = response_data['candidates'][0]['content']['parts'][0]['text'].strip()
             return jsonify({'reply': bot_reply})
         else:
-            return jsonify({'reply': "Sir, Google API ne mana kar diya. Key check kijiye! ⚡"})
+            # Deep error logging for troubleshooting
+            print("API Error Response:", response_data)
+            return jsonify({'reply': "Sir, API connection mein kuch glitch hai. Ek baar refresh kijiye!"})
             
     except Exception as e:
-        return jsonify({'reply': "Network issue hai sir. Ek baar page Refresh karke try karein! 🔄"})
+        print("Request Exception:", e)
+        return jsonify({'reply': "Network busy hai sir, please try again in a moment! 🔄"})
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    # Render port configuration
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
     
