@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    /* Ye line screen ko zoom hone se rokti hai */
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Jarvis PRO AI</title>
+    <style>
+        /* --- Premium Dark Purple Theme --- */
+        body { 
+            background: linear-gradient(160deg, #1a0b2e 0%, #000000 100%);
+            color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0; padding: 0; 
+            /* Magic Line for Mobile: dvh handles keyboard pops perfectly */
+            height: 100vh; height: 100dvh; 
+            overflow: hidden; display: flex; flex-direction: column;
+        }
+
+        /* --- Scrollable Areas --- */
+        #home-screen {
+            flex: 1; overflow-y: auto; padding-bottom: 20px;
+        }
+        .chat-area { 
+            flex: 1; overflow-y: auto; padding: 20px; display: none; flex-direction: column; gap: 20px; 
+        }
+
+        /* Top Icons */
+        .top-bar { display: flex; justify-content: space-between; padding: 20px; font-size: 20px; opacity: 0.8; }
+
+        /* --- Glowing Orb Animation --- */
+        .orb-container { display: flex; justify-content: center; margin-top: 2vh; }
+        .orb {
+            width: 80px; height: 80px; border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #e0c3fc, #8a2be2, #10002b);
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.6), 0 0 60px rgba(138, 43, 226, 0.4);
+            animation: float 4s ease-in-out infinite;
+        }
+        @keyframes float { 
+            0%, 100% { transform: translateY(0px) scale(1); box-shadow: 0 0 30px rgba(138,43,226,0.6); } 
+            50% { transform: translateY(-15px) scale(1.05); box-shadow: 0 0 50px rgba(138,43,226,0.8); } 
+        }
+
+        /* Greeting Text */
+        .greeting-section { text-align: center; margin-top: 20px; padding: 0 20px; }
+        .greeting-title { font-size: 24px; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.5px; }
+        .greeting-sub { font-size: 13px; color: #a1a1aa; line-height: 1.4; }
+
+        /* --- Glassmorphism Grid Cards --- */
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 30px 20px; margin-top: 10px; }
+        .card {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px; padding: 18px; cursor: pointer; transition: 0.3s;
+        }
+        .card:active { transform: scale(0.95); background: rgba(255, 255, 255, 0.1); }
+        .card-icon { font-size: 20px; margin-bottom: 12px; }
+        .card-title { font-size: 14px; font-weight: 600; margin-bottom: 5px; }
+        .card-sub { font-size: 11px; color: #8e8e93; }
+
+        /* Chat Messages */
+        .msg { max-width: 85%; padding: 14px 18px; border-radius: 20px; font-size: 15px; line-height: 1.5; }
+        .user-msg { align-self: flex-end; background: #6b21a8; color: #fff; border-bottom-right-radius: 5px; }
+        .bot-msg { align-self: flex-start; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-bottom-left-radius: 5px; }
+
+        /* --- Native App Style Bottom Input --- */
+        .input-wrapper { 
+            width: 100%; padding: 15px 20px; box-sizing: border-box; 
+            background: #0a0412; /* Solid background for keyboard transition */
+            border-top: 1px solid rgba(255,255,255,0.05);
+            /* Shrink rukne ke liye taaki height kam na ho */
+            flex-shrink: 0; 
+            /* iPhone/Android gesture bar ke liye extra padding */
+            padding-bottom: calc(15px + env(safe-area-inset-bottom));
+        }
+        .input-pill {
+            display: flex; align-items: center; background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(20px);
+            border-radius: 30px; padding: 8px 10px; width: 100%; box-sizing: border-box;
+        }
+        .cam-btn { background: none; border: none; font-size: 20px; padding: 0 10px; color: #a1a1aa; }
+        input[type="text"] { flex: 1; background: transparent; border: none; color: #fff; font-size: 15px; outline: none; padding: 5px 10px; }
+        input::placeholder { color: #8e8e93; }
+        .send-btn { background: none; border: none; font-size: 18px; color: #a1a1aa; padding: 0 10px; cursor: pointer; }
+        .mic-btn { background: #8a2be2; color: #fff; border: none; width: 38px; height: 38px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; box-shadow: 0 0 15px rgba(138,43,226,0.5); cursor: pointer; margin-left: 5px; }
+    </style>
+</head>
+<body>
+
+    <div id="home-screen">
+        <div class="top-bar"><span>◧</span><span>✂</span></div>
+        <div class="orb-container"><div class="orb"></div></div>
+        <div class="greeting-section">
+            <div class="greeting-title">Hey, Sir</div>
+            <div class="greeting-sub">Give any command naturally, from revising PSIR to strategy for CDS.</div>
+        </div>
+        <div class="grid-container">
+            <div class="card" onclick="setCommand('Revise Plato theory of Justice')"><div class="card-icon">🏛️</div><div class="card-title">PSIR Revision</div><div class="card-sub">Quick political concepts</div></div>
+            <div class="card" onclick="setCommand('What is the eligibility for CDS exam?')"><div class="card-icon">🎯</div><div class="card-title">CDS Guidance</div><div class="card-sub">Defense career details</div></div>
+            <div class="card" onclick="setCommand('Summarise the daily news')"><div class="card-icon">📰</div><div class="card-title">Summarise News</div><div class="card-sub">Essential info in few words</div></div>
+            <div class="card" onclick="setCommand('Motivate me for studies')"><div class="card-icon">⚡</div><div class="card-title">Stay Motivated</div><div class="card-sub">Boost your energy</div></div>
+        </div>
+    </div>
+
+    <div class="chat-area" id="chat-cont">
+        <div id="chat-box" style="display: flex; flex-direction: column; gap: 20px;"></div>
+    </div>
+
+    <div class="input-wrapper">
+        <div class="input-pill">
+            <button class="cam-btn">📷</button>
+            <input type="text" id="user-input" placeholder="Ask me anything..." onkeypress="handleEnter(event)">
+            <button class="send-btn" onclick="sendMessage()">➤</button>
+            <button class="mic-btn">🎙</button>
+        </div>
+    </div>
+
+    <script>
+        const homeScreen = document.getElementById("home-screen");
+        const chatCont = document.getElementById("chat-cont");
+        const chatBox = document.getElementById("chat-box");
+        const inputField = document.getElementById("user-input");
+
+        function setCommand(text) { inputField.value = text; inputField.focus(); }
+
+        function appendMsg(text, type) {
+            const d = document.createElement("div");
+            d.className = "msg " + type;
+            d.innerHTML = text.replace(/\n/g, '<br>');
+            chatBox.appendChild(d);
+            
+            // Timeout delay for smoother scrolling when keyboard is open
+            setTimeout(() => {
+                chatCont.scrollTop = chatCont.scrollHeight;
+            }, 50);
+        }
+
+        function sendMessage() {
+            const t = inputField.value.trim();
+            if (!t) return;
+            if (homeScreen.style.display !== "none") { homeScreen.style.display = "none"; chatCont.style.display = "flex"; }
+            appendMsg(t, "user-msg");
+            inputField.value = "";
+            
+            // Bring focus back to input if you want continuous typing
+            // inputField.focus(); 
+
+            fetch("/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: t }) })
+            .then(r => r.json()).then(data => {
+                appendMsg(data.reply, "bot-msg");
+                const u = new SpeechSynthesisUtterance(data.reply); u.lang = 'hi-IN'; window.speechSynthesis.speak(u);
+            });
+        }
+        function handleEnter(e) { if(e.key === 'Enter') sendMessage(); }
+    </script>
+</body>
+              </html>
+              
