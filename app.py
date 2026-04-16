@@ -6,7 +6,7 @@ import os
 app = Flask(__name__)
 
 # --- Nayi API Key Fit Kar Di Hai ---
-API_KEY = "AQ.Ab8RN6IGj2GFh9UqgyQqo0f25_fBo-ajRlk5pMYeWXqdXPDAOQ" 
+API_KEY = "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" 
 
 @app.route('/')
 def home():
