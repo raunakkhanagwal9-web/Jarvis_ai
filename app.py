@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-# Yeh line Render ki settings se key uthayegi
+# Render settings se key uthayega
 API_KEY = os.environ.get("GROQ_API_KEY")
 
 @app.route('/')
@@ -41,7 +41,7 @@ def ask():
         else:
             return jsonify({'reply': "Sir, Groq engine mein kuch issue hai. Ek baar refresh kijiye!"})
     except:
-        return jsonify({'reply': "Connection busy hai sir!"})
+        return jsonify({'reply': "Connection busy hai sir, try again!"})
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
