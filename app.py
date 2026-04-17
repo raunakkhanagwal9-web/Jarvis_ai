@@ -1,11 +1,10 @@
-from flask import Flask, request, 
-jsonify, render_template
+from flask import Flask, request, jsonify, render_template
 import requests
 import os
 
 app = Flask(__name__)
 
-# 🔥 Yeh line Render ki settings se key uthayegi
+# Yeh line Render ki settings se key uthayegi
 API_KEY = os.environ.get("GROQ_API_KEY")
 
 @app.route('/')
@@ -29,7 +28,7 @@ def ask():
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
-            {"role": "system", "content": "You are J.A.R.V.I.S., a witty AI assistant for a UPSC/CDS aspirant. Speak in Hinglish."},
+            {"role": "system", "content": "You are J.A.R.V.I.S., a witty AI assistant for a UPSC/CDS aspirant. Speak in Hinglish like Tony Stark's assistant."},
             {"role": "user", "content": user_query}
         ]
     }
@@ -40,7 +39,7 @@ def ask():
         if 'choices' in res_data:
             return jsonify({'reply': res_data['choices'][0]['message']['content'].strip()})
         else:
-            return jsonify({'reply': "Sir, Groq limit reach ho gayi ya key galat hai!"})
+            return jsonify({'reply': "Sir, Groq engine mein kuch issue hai. Ek baar refresh kijiye!"})
     except:
         return jsonify({'reply': "Connection busy hai sir!"})
 
