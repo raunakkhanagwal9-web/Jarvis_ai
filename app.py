@@ -1,11 +1,12 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, 
+jsonify, render_template
 import requests
 import os
 
 app = Flask(__name__)
 
-# --- Groq API Key Activated ---
-API_KEY = "Gsk_D34bOOQLjVLGOuUxeW3JWGdyb3FYLlGpK2mpy3z1kV1FDJVFjWJ3"
+# 🔥 Yeh line Render ki settings se key uthayegi
+API_KEY = os.environ.get("GROQ_API_KEY")
 
 @app.route('/')
 def home():
@@ -16,6 +17,9 @@ def ask():
     data = request.json
     user_query = data.get('query')
     
+    if not API_KEY:
+        return jsonify({'reply': "Sir, Key missing hai. Render settings check kijiye!"})
+
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
         "Authorization": f"Bearer {API_KEY}",
@@ -25,10 +29,7 @@ def ask():
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
-            {
-                "role": "system", 
-                "content": "You are J.A.R.V.I.S., a witty, smart, and helpful AI assistant. You are helping a 19-year-old student who is preparing for UPSC (Political Science) and CDS (Air Force/Para SF). Speak in Hinglish (Hindi + English) like Tony Stark's assistant. Be motivating and sharp."
-            },
+            {"role": "system", "content": "You are J.A.R.V.I.S., a witty AI assistant for a UPSC/CDS aspirant. Speak in Hinglish."},
             {"role": "user", "content": user_query}
         ]
     }
@@ -36,15 +37,12 @@ def ask():
     try:
         res = requests.post(url, headers=headers, json=payload, timeout=20)
         res_data = res.json()
-        
         if 'choices' in res_data:
-            bot_reply = res_data['choices'][0]['message']['content'].strip()
-            return jsonify({'reply': bot_reply})
+            return jsonify({'reply': res_data['choices'][0]['message']['content'].strip()})
         else:
-            return jsonify({'reply': "Sir, Groq engine mein kuch issue hai. Ek baar refresh kijiye!"})
-            
-    except Exception as e:
-        return jsonify({'reply': "Connection busy hai sir, Jarvis is trying to reconnect... 🔄"})
+            return jsonify({'reply': "Sir, Groq limit reach ho gayi ya key galat hai!"})
+    except:
+        return jsonify({'reply': "Connection busy hai sir!"})
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
