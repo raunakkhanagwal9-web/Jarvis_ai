@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-# Render settings se key uthayega
+# Render ke Environment Variable se key uthayega
 API_KEY = os.environ.get("GROQ_API_KEY")
 
 @app.route('/')
@@ -17,7 +17,7 @@ def ask():
     user_query = data.get('query')
     
     if not API_KEY:
-        return jsonify({'reply': "Sir, Key missing hai. Render settings check kijiye!"})
+        return jsonify({'reply': "Sir, API Key missing hai. Render settings check kijiye!"})
 
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
@@ -28,20 +28,28 @@ def ask():
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
-            {"role": "system", "content": "You are J.A.R.V.I.S., a witty AI assistant for a UPSC/CDS aspirant. Speak in Hinglish like Tony Stark's assistant."},
+            {"role": "system", "content": "You are J.A.R.V.I.S., a witty AI assistant for a UPSC aspirant. Speak in Hinglish."},
             {"role": "user", "content": user_query}
         ]
     }
     
     try:
-        res = requests.post(url, headers=headers, json=payload, timeout=20)
+        # Timeout ko 30 seconds kar diya taaki slow network par fail na ho
+        res = requests.post(url, headers=headers, json=payload, timeout=30)
         res_data = res.json()
+        
         if 'choices' in res_data:
-            return jsonify({'reply': res_data['choices'][0]['message']['content'].strip()})
+            bot_reply = res_data['choices'][0]['message']['content'].strip()
+            return jsonify({'reply': bot_reply})
         else:
-            return jsonify({'reply': "Sir, Groq engine mein kuch issue hai. Ek baar refresh kijiye!"})
-    except:
-        return jsonify({'reply': "Connection busy hai sir, try again!"})
+            # Asli error message print hoga taaki hum logs mein dekh sakein
+            error_msg = res_data.get('error', {}).get('message', 'Unknown Error')
+            print(f"Groq Error: {error_msg}")
+            return jsonify({'reply': f"Sir, Groq error: {error_msg}"})
+            
+    except Exception as e:
+        print(f"Python Error: {str(e)}")
+        return jsonify({'reply': "Connection timeout! Ek baar phir try kijiye sir."})
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
