@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-# Render settings se key uthayega
+# Render ki settings se API key lega
 API_KEY = os.environ.get("GROQ_API_KEY")
 
 @app.route('/')
@@ -17,7 +17,7 @@ def ask():
     user_query = data.get('query')
     
     if not API_KEY:
-        return jsonify({'reply': "Sir, Key missing hai. Render settings check kijiye!"})
+        return jsonify({'reply': "Sir, API Key missing hai. Render ki settings mein check kijiye!"})
 
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
@@ -28,7 +28,10 @@ def ask():
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
-            {"role": "system", "content": "You are J.A.R.V.I.S., a witty and smart AI assistant. Speak in Hinglish like Tony Stark's assistant. Be helpful and cool."},
+            {
+                "role": "system", 
+                "content": "You are J.A.R.V.I.S., a witty, loyal, and highly intelligent AI assistant. Speak in Hinglish (Hindi + English mix). Your tone should be cool and human-like, occasionally calling the user 'Sir' or 'Boss'. You are NOT a typical chatbot; you are a personal assistant like the one from Iron Man. Help with anything from daily tasks to coding and fun chats."
+            },
             {"role": "user", "content": user_query}
         ]
     }
@@ -39,9 +42,9 @@ def ask():
         if 'choices' in res_data:
             return jsonify({'reply': res_data['choices'][0]['message']['content'].strip()})
         else:
-            return jsonify({'reply': "Sir, Groq engine mein kuch issue hai. Ek baar refresh kijiye!"})
+            return jsonify({'reply': "Sir, Groq engine is busy. Please try again in a moment."})
     except Exception as e:
-        return jsonify({'reply': "Connection busy hai sir!"})
+        return jsonify({'reply': "Connection busy hai, Sir!"})
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
