@@ -14,7 +14,7 @@
 
         body, html {
             margin: 0; padding: 0;
-            height: 100dvh; /* keyboard resizing logic in CSS */
+            height: 100dvh;
             font-family: 'SF Pro Display', -apple-system, sans-serif;
             background: var(--bg-gradient);
             color: white;
@@ -23,13 +23,14 @@
             overflow: hidden;
         }
 
-        /* Top Orb Section */
+        /* Home UI Section */
         #main-ui {
             text-align: center;
             padding: 50px 20px 20px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
+            overflow-y: auto;
         }
 
         .orb {
@@ -40,6 +41,7 @@
             filter: blur(5px);
             box-shadow: 0 0 40px rgba(168, 85, 247, 0.6);
             animation: pulse 4s infinite alternate;
+            flex-shrink: 0;
         }
 
         @keyframes pulse {
@@ -47,38 +49,36 @@
             to { transform: scale(1.1); opacity: 1; box-shadow: 0 0 60px rgba(168, 85, 247, 0.9); }
         }
 
-        .welcome-text h2 { margin: 0; font-size: 26px; font-weight: 600; letter-spacing: 1px; }
-        .welcome-text p { font-size: 14px; color: #9ca3af; margin: 15px auto; max-width: 300px; line-height: 1.5; }
+        .welcome-text h2 { margin: 0; font-size: 26px; font-weight: 600; }
+        .welcome-text .tagline { font-size: 16px; font-weight: bold; color: white; margin: 10px 0; }
+        .welcome-text p { font-size: 13px; color: #9ca3af; margin: 0 auto; max-width: 250px; line-height: 1.4; }
 
-        /* Feature Cards */
+        /* Grid */
         .grid-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
-            padding: 20px 10px;
-            margin-top: auto; /* Push to bottom of main area */
+            padding: 30px 10px;
+            margin-top: auto;
         }
 
         .card {
             background: var(--card-bg);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 22px 18px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             backdrop-filter: blur(10px);
-            transition: 0.3s ease;
             text-align: left;
         }
 
-        .card:active { transform: scale(0.95); background: rgba(255, 255, 255, 0.1); }
+        .card-icon { font-size: 20px; }
+        .card-title { font-weight: 600; font-size: 14px; }
+        .card-desc { font-size: 11px; color: #9ca3af; line-height: 1.3; }
 
-        .card-icon { font-size: 22px; }
-        .card-title { font-weight: 600; font-size: 15px; margin-top: 5px; }
-        .card-desc { font-size: 12px; color: #9ca3af; line-height: 1.3; }
-
-        /* Chat History (Hidden initially) */
+        /* Chat History */
         #chat-history {
             display: none;
             flex-grow: 1;
@@ -86,28 +86,26 @@
             padding: 20px;
             flex-direction: column;
             gap: 15px;
-            padding-bottom: 100px; /* Space for input bar */
-            scroll-behavior: smooth;
+            padding-bottom: 100px;
         }
 
-        /* Message Bubbles */
-        .msg { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.4; }
+        /* Bubbles */
+        .msg { max-width: 85%; padding: 12px 16px; border-radius: 20px; font-size: 15px; line-height: 1.4; }
         .user-msg { align-self: flex-end; background: #7c3aed; border-bottom-right-radius: 4px; }
-        .jarvis-msg { align-self: flex-start; background: rgba(255,255,255,0.1); border-bottom-left-radius: 4px; }
+        .jarvis-msg { align-self: flex-start; background: rgba(255,255,255,0.1); border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
 
-        /* Modern Fixed Input Bar */
+        /* Floating Input Bar */
         .bottom-nav {
             padding: 10px 15px;
-            background: linear-gradient(transparent, #050505 50%);
             position: fixed;
             bottom: 0; left: 0; right: 0;
             z-index: 1000;
-            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            background: linear-gradient(transparent, #050505 40%);
         }
 
         .input-bar {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(25px);
             border-radius: 30px;
             display: flex;
             align-items: center;
@@ -120,20 +118,14 @@
             background: transparent;
             border: none;
             color: white;
-            padding: 12px 10px;
+            padding: 12px 5px;
             outline: none;
-            font-size: 16px; /* No iOS zoom */
+            font-size: 16px;
         }
 
-        .icon-btn {
-            background: none; border: none; color: white;
-            font-size: 18px; cursor: pointer; padding: 10px;
-            transition: 0.2s;
-        }
-        .icon-btn:active { transform: scale(0.9); }
-
-        .send-btn { color: #d8b4fe; font-weight: bold; font-size: 14px; }
-        .mic-btn { background: #7c3aed; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-left: 5px; }
+        .icon-btn { background: none; border: none; color: white; cursor: pointer; padding: 8px; font-size: 18px; }
+        .send-text { color: #d8b4fe; font-weight: 600; font-size: 14px; margin-right: 5px; }
+        .mic-btn { background: #7c3aed; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
     </style>
 </head>
@@ -143,31 +135,15 @@
         <div class="orb"></div>
         <div class="welcome-text">
             <h2>Hi, Boss</h2>
-            <p style="font-size: 16px; color: white; font-weight: bold; margin-bottom: 5px;">Your Personal AI Assistant</p>
+            <div class="tagline">Your Personal AI Assistant</div>
             <p>Ready to generate image, schedule meetings, or just chat.</p>
         </div>
 
         <div class="grid-container">
-            <div class="card">
-                <span class="card-icon">🖼️</span>
-                <span class="card-title">Generate Image</span>
-                <span class="card-desc">Instantly bring ideas to life</span>
-            </div>
-            <div class="card">
-                <span class="card-icon">🎥</span>
-                <span class="card-title">Create Video</span>
-                <span class="card-desc">Effortless reels with AI</span>
-            </div>
-            <div class="card">
-                <span class="card-icon">📝</span>
-                <span class="card-title">Summarise Text</span>
-                <span class="card-desc">Essential info in few words</span>
-            </div>
-            <div class="card">
-                <span class="card-icon">📄</span>
-                <span class="card-title">CV Builder</span>
-                <span class="card-desc">Create your own CV</span>
-            </div>
+            <div class="card"><span class="card-icon">🖼️</span><span class="card-title">Generate Image</span><span class="card-desc">Instantly bring ideas to life</span></div>
+            <div class="card"><span class="card-icon">🎥</span><span class="card-title">Create Video</span><span class="card-desc">Effortless reels with AI</span></div>
+            <div class="card"><span class="card-icon">📝</span><span class="card-title">Summarise Text</span><span class="card-desc">Essential info in few words</span></div>
+            <div class="card"><span class="card-icon">📄</span><span class="card-title">CV Builder</span><span class="card-desc">Create your own CV</span></div>
         </div>
     </div>
 
@@ -177,7 +153,7 @@
         <div class="input-bar">
             <button class="icon-btn">📷</button>
             <input type="text" id="userInput" placeholder="Ask J.A.R.V.I.S..." autocomplete="off">
-            <button class="icon-btn send-btn" onclick="sendMessage()">SEND</button>
+            <button class="icon-btn send-text" onclick="sendMessage()">SEND</button>
             <button class="icon-btn mic-btn">🎤</button>
         </div>
     </div>
@@ -191,15 +167,11 @@
             const query = input.value.trim();
             if (!query) return;
 
-            // Switch UI: Hide Main Screen, Show Chat
             if (mainUi.style.display !== 'none') {
                 mainUi.style.display = 'none';
                 chatHistory.style.display = 'flex';
-                // Small trick to ensure scrolling works immediately
-                chatHistory.scrollTop = chatHistory.scrollHeight;
             }
 
-            // User Message
             const uDiv = document.createElement('div');
             uDiv.className = 'msg user-msg';
             uDiv.innerText = query;
@@ -208,7 +180,6 @@
             input.value = '';
             chatHistory.scrollTop = chatHistory.scrollHeight;
 
-            // Jarvis Typing...
             const jDiv = document.createElement('div');
             jDiv.className = 'msg jarvis-msg';
             jDiv.innerText = "...";
@@ -222,25 +193,18 @@
                 });
                 const data = await response.json();
                 jDiv.innerText = data.reply;
-            } catch (e) { jDiv.innerText = "Error, Sir. Systems busy."; }
+            } catch (e) { jDiv.innerText = "Sir, connection lost."; }
 
             chatHistory.scrollTop = chatHistory.scrollHeight;
         }
 
-        // Enter Key Support
         input.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
 
-        // Keyboard Behavior Fix for Mobile (ChatGPT Style)
         if ('visualViewport' in window) {
             window.visualViewport.addEventListener('resize', () => {
-                const bottomNav = document.querySelector('.bottom-nav');
-                // Keyboard ki height ke hisaab se position adjust hogi
-                bottomNav.style.bottom = `${window.innerHeight - window.visualViewport.height}px`;
-                
-                // Keyboard open hone par agar chatting shuru ho gayi ho, toh scroll niche karo
-                if (chatHistory.style.display === 'flex') {
-                    chatHistory.scrollTop = chatHistory.scrollHeight;
-                }
+                const nav = document.querySelector('.bottom-nav');
+                nav.style.bottom = `${window.innerHeight - window.visualViewport.height}px`;
+                if (chatHistory.style.display === 'flex') chatHistory.scrollTop = chatHistory.scrollHeight;
             });
         }
     </script>
