@@ -25,14 +25,18 @@ def ask():
         "Content-Type": "application/json"
     }
     
-    payload = {
-        "model": "llama-3.3-70b-versatile",
-        "messages": [
-            {"role": "system", "content": "You are J.A.R.V.I.S., a witty AI assistant for a UPSC aspirant. Speak in Hinglish."},
-            {"role": "user", "content": user_query}
-        ]
-    }
-    
+
+payload = {
+    "model": "llama-3.3-70b-versatile",
+    "messages": [
+        {
+            "role": "system", 
+            "content": "You are J.A.R.V.I.S., a witty and highly capable AI assistant. Speak in a mix of Hindi and English (Hinglish). Be cool, helpful, and human-like. Don't restrict yourself to UPSC; talk about anything the user wants."
+        },
+        {"role": "user", "content": user_query}
+    ]
+}
+
     try:
         # Timeout ko 30 seconds kar diya taaki slow network par fail na ho
         res = requests.post(url, headers=headers, json=payload, timeout=30)
