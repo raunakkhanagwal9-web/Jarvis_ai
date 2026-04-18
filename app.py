@@ -4,7 +4,7 @@ import os
 
 app = Flask(__name__)
 
-# Render ke Environment Variable se key uthayega
+# Render settings se key uthayega
 API_KEY = os.environ.get("GROQ_API_KEY")
 
 @app.route('/')
@@ -17,7 +17,7 @@ def ask():
     user_query = data.get('query')
     
     if not API_KEY:
-        return jsonify({'reply': "Sir, API Key missing hai. Render settings check kijiye!"})
+        return jsonify({'reply': "Sir, Key missing hai. Render settings check kijiye!"})
 
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
@@ -25,35 +25,23 @@ def ask():
         "Content-Type": "application/json"
     }
     
-
-payload = {
-    "model": "llama-3.3-70b-versatile",
-    "messages": [
-        {
-            "role": "system", 
-            "content": "You are J.A.R.V.I.S., a witty and highly capable AI assistant. Speak in a mix of Hindi and English (Hinglish). Be cool, helpful, and human-like. Don't restrict yourself to UPSC; talk about anything the user wants."
-        },
-        {"role": "user", "content": user_query}
-    ]
-}
-
+    payload = {
+        "model": "llama-3.3-70b-versatile",
+        "messages": [
+            {"role": "system", "content": "You are J.A.R.V.I.S., a witty and smart AI assistant. Speak in Hinglish like Tony Stark's assistant. Be helpful and cool."},
+            {"role": "user", "content": user_query}
+        ]
+    }
+    
     try:
-        # Timeout ko 30 seconds kar diya taaki slow network par fail na ho
-        res = requests.post(url, headers=headers, json=payload, timeout=30)
+        res = requests.post(url, headers=headers, json=payload, timeout=20)
         res_data = res.json()
-        
         if 'choices' in res_data:
-            bot_reply = res_data['choices'][0]['message']['content'].strip()
-            return jsonify({'reply': bot_reply})
+            return jsonify({'reply': res_data['choices'][0]['message']['content'].strip()})
         else:
-            # Asli error message print hoga taaki hum logs mein dekh sakein
-            error_msg = res_data.get('error', {}).get('message', 'Unknown Error')
-            print(f"Groq Error: {error_msg}")
-            return jsonify({'reply': f"Sir, Groq error: {error_msg}"})
-            
+            return jsonify({'reply': "Sir, Groq engine mein kuch issue hai. Ek baar refresh kijiye!"})
     except Exception as e:
-        print(f"Python Error: {str(e)}")
-        return jsonify({'reply': "Connection timeout! Ek baar phir try kijiye sir."})
+        return jsonify({'reply': "Connection busy hai sir!"})
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
