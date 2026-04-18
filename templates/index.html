@@ -3,54 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>J.A.R.V.I.S. | Your Personal AI Assistant</title>
+    <title>J.A.R.V.I.S.</title>
     <style>
         body, html {
             margin: 0; padding: 0;
             height: 100%; width: 100%;
-            background: #050505;
-            color: white;
+            background: #000;
             font-family: -apple-system, sans-serif;
-            overflow: hidden; /* Body ko scroll hone se rokega */
+            overflow: hidden; /* Screen ko hilne se rokega */
         }
 
-        /* Main Wrapper jo poori screen cover karega */
-        .app-wrapper {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            height: 100dvh; /* Mobile keyboard ke liye best */
-        }
-
-        /* Header hamesha Top par fixed rahega */
+        /* Header hamesha Top par Fixed */
         header {
-            padding: 15px;
-            text-align: center;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 60px;
             background: rgba(10, 10, 10, 0.9);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            z-index: 10;
+            border-bottom: 1px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
         }
 
-        /* Chat History jo bachi hui jagah lega aur scroll hoga */
+        /* Chat History - Iska scroll independent rahega */
         #chat-history {
-            flex: 1; /* Ye saari khali jagah le lega */
+            height: 100vh;
             overflow-y: auto;
-            padding: 20px;
+            padding: 70px 15px 100px 15px; /* Top aur Bottom fixed bars ke liye space */
+            box-sizing: border-box;
             display: flex;
             flex-direction: column;
             gap: 15px;
-            -webkit-overflow-scrolling: touch;
+            background: #000;
         }
 
-        /* Naya search bar jo hamesha bottom par rahega */
+        /* Search Bar hamesha Bottom par Fixed */
         .bottom-nav {
-            padding: 10px 15px 25px 15px; /* Niche thodi extra jagah */
-            background: #050505;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            padding: 15px;
+            background: #000;
+            z-index: 1000;
+            /* Ye line keyboard ke saath move hone mein help karegi */
+            padding-bottom: max(15px, env(safe-area-inset-bottom));
         }
 
         .input-bar {
-            background: #1a1a1a;
+            background: #1c1c1e;
             border-radius: 25px;
             display: flex;
             align-items: center;
@@ -65,42 +66,40 @@
             color: white;
             padding: 12px;
             outline: none;
-            font-size: 16px; /* 16px se zoom nahi hota iPhone par */
+            font-size: 16px; /* 16px se browser zoom nahi hota */
         }
 
-        /* Message Bubbles */
-        .msg { max-width: 80%; padding: 12px 16px; border-radius: 20px; font-size: 15px; }
-        .user-msg { align-self: flex-end; background: #7c3aed; border-bottom-right-radius: 4px; }
-        .jarvis-msg { align-self: flex-start; background: #262626; border-bottom-left-radius: 4px; }
-
-        #main-ui { text-align: center; padding: 40px 20px; }
-        .orb { width: 80px; height: 80px; background: radial-gradient(circle, #a855f7, #6366f1); border-radius: 50%; margin: 0 auto 20px; filter: blur(2px); box-shadow: 0 0 30px #a855f7; }
+        .msg { max-width: 80%; padding: 12px; border-radius: 18px; font-size: 15px; color: white; }
+        .user-msg { align-self: flex-end; background: #7c3aed; }
+        .jarvis-msg { align-self: flex-start; background: #262626; }
+        
+        .orb { width: 50px; height: 50px; background: radial-gradient(circle, #a855f7, #6366f1); border-radius: 50%; filter: blur(1px); box-shadow: 0 0 20px #a855f7; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div class="app-wrapper">
     <header>
-        <div style="font-weight: bold; color: #a855f7;">J.A.R.V.I.S.</div>
-        <div style="font-size: 10px; color: #888;">Orbix Studio</div>
+        <div style="text-align: center;">
+            <div style="font-weight: bold; font-size: 14px; color: white;">J.A.R.V.I.S.</div>
+            <div style="font-size: 9px; color: #a855f7;">ORBIX STUDIO</div>
+        </div>
     </header>
 
     <div id="chat-history">
-        <div id="main-ui">
-            <div class="orb"></div>
-            <h3>Hi, Orbix Studio</h3>
-            <p style="font-size: 12px; color: #666;">How can I assist you today?</p>
+        <div id="welcome" style="text-align:center; margin-top: 50px; color: white;">
+            <center><div class="orb"></div></center>
+            <h3 style="margin: 0;">Systems Online</h3>
+            <p style="font-size: 12px; color: #555;">Waiting for your command, Boss.</p>
         </div>
     </div>
 
     <div class="bottom-nav">
         <div class="input-bar">
-            <span style="margin-right: 10px;">📷</span>
-            <input type="text" id="userInput" placeholder="Type Message" autocomplete="off">
-            <button onclick="sendMessage()" style="background:none; border:none; cursor:pointer;">🚀</button>
+            <span style="font-size: 18px; margin-right: 8px;">📷</span>
+            <input type="text" id="userInput" placeholder="Type a message..." autocomplete="off">
+            <button onclick="sendMessage()" style="background:none; border:none; color:#a855f7; font-weight:bold;">SEND</button>
         </div>
     </div>
-</div>
 
 <script>
     const chatHistory = document.getElementById('chat-history');
@@ -110,7 +109,7 @@
         const query = input.value.trim();
         if (!query) return;
 
-        document.getElementById('main-ui').style.display = 'none';
+        document.getElementById('welcome').style.display = 'none';
 
         const uDiv = document.createElement('div');
         uDiv.className = 'msg user-msg';
@@ -133,19 +132,21 @@
             });
             const data = await response.json();
             jDiv.innerText = data.reply;
-        } catch (e) { jDiv.innerText = "Error, Sir."; }
+        } catch (e) { jDiv.innerText = "Connection lost, Sir."; }
 
         chatHistory.scrollTop = chatHistory.scrollHeight;
     }
 
-    // Input par focus hote hi chat ko niche dhakalna
-    input.addEventListener('focus', () => {
-        setTimeout(() => {
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-        }, 300);
-    });
-
     input.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
+
+    // Isse keyboard khulne par page nahi hilega, sirf input upar aayega
+    if ('visualViewport' in window) {
+        window.visualViewport.addEventListener('resize', () => {
+            const nav = document.querySelector('.bottom-nav');
+            // Keyboard ki height ke hisaab se position adjust hogi
+            nav.style.bottom = `${window.innerHeight - window.visualViewport.height}px`;
+        });
+    }
 </script>
 
 </body>
