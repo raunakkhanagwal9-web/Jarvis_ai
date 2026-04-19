@@ -2,50 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
     <title>J.A.R.V.I.S. | Personal AI</title>
     <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
-        /* 🔥 RESET */
-        * { box-sizing: border-box; }
-
-        :root {
-            --bg-gradient: radial-gradient(circle at top, #2a1b3d 0%, #050505 100%);
-            --card-bg: rgba(255, 255, 255, 0.05);
-        }
-
+        /* 🔥 1. POORE PAGE KO LOCK KAR DO 🔥 */
         html, body {
             margin: 0; padding: 0;
-            height: 100%; 
-            overflow: hidden; /* Screen hilne se rokega */
-            font-family: 'SF Pro Display', -apple-system, sans-serif;
+            width: 100vw; height: 100vh; /* Fixed screen size */
+            overflow: hidden !important; /* Page life mein kabhi scroll nahi hoga */
             background: #050505;
             color: white;
+            font-family: 'SF Pro Display', -apple-system, sans-serif;
         }
 
-        /* 🔥 MAIN CONTAINER */
-        .container {
-            height: 100dvh; /* dynamic height fix */
-            display: flex;
-            flex-direction: column;
-            background: var(--bg-gradient);
-        }
-
-        /* 🔥 CHAT AREA */
-        .chat-box {
-            flex: 1;
-            overflow-y: auto;
+        /* 🔥 2. CHAT AREA (Sirf ye box scroll hoga) 🔥 */
+        #chatBox {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 80px; /* Niche search bar ke liye strictly 80px chhor diya */
+            overflow-y: auto; /* Scroll sirf is dambe ke andar hoga */
             padding: 15px;
-            padding-bottom: 90px; /* 👇 input bar ke liye space (Aapka code) */
             scroll-behavior: smooth;
             display: flex;
             flex-direction: column;
             gap: 15px;
+            -webkit-overflow-scrolling: touch;
         }
 
-        /* --- Welcome UI --- */
+        /* 🔥 3. INPUT AREA (Ye dabba bottom pe fix hai) 🔥 */
+        #inputArea {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px; /* Strict height */
+            background: #050505;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            z-index: 9999;
+        }
+
+        /* --- Welcome UI Styles --- */
         #main-ui { text-align: center; padding-top: 20px; display: flex; flex-direction: column; }
         .orb { width: 90px; height: 90px; background: radial-gradient(circle, #d8b4fe 0%, #a855f7 50%, #6366f1 100%); border-radius: 50%; margin: 0 auto 20px; filter: blur(5px); box-shadow: 0 0 40px rgba(168, 85, 247, 0.6); animation: pulse 4s infinite alternate; }
         @keyframes pulse { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.1); opacity: 1; box-shadow: 0 0 60px rgba(168, 85, 247, 0.9); } }
@@ -55,12 +59,12 @@
         .welcome-text p { font-size: 13px; color: #9ca3af; margin: 0 auto; max-width: 250px; line-height: 1.4; }
 
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
-        .card { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 6px; backdrop-filter: blur(10px); text-align: left; }
+        .card { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 6px; backdrop-filter: blur(10px); text-align: left; }
         .card-icon { font-size: 20px; }
         .card-title { font-weight: 600; font-size: 14px; }
         .card-desc { font-size: 11px; color: #9ca3af; line-height: 1.3; }
 
-        /* 🔥 MESSAGES */
+        /* --- Message Styles --- */
         .message { max-width: 85%; padding: 12px 16px; border-radius: 20px; word-wrap: break-word; font-size: 15px; line-height: 1.5; }
         .message p { margin: 0 0 10px 0; } .message p:last-child { margin: 0; }
         .message ul, .message ol { margin: 5px 0; padding-left: 20px; } .message strong { color: #d8b4fe; }
@@ -69,37 +73,9 @@
         .bot { background: rgba(255,255,255,0.1); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
         .user { background: #7c3aed; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
 
-        /* 🔥 INPUT AREA (SEARCH BAR FIXED - EXACTLY AAPKA CODE) */
-        .input-area {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 15px;
-            background: #050505; /* Black background taaki messages peeche se na dikhein */
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-bottom: calc(10px + env(safe-area-inset-bottom));
-            z-index: 1000;
-        }
-
-        .input-wrapper {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(25px);
-            border-radius: 30px;
-            display: flex;
-            align-items: center;
-            padding: 5px 10px 5px 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .input-wrapper input {
-            flex: 1; background: transparent; border: none; color: white;
-            padding: 12px 5px; outline: none; font-size: 16px;
-        }
+        /* --- Input Bar Styles --- */
+        .input-wrapper { width: 100%; background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(25px); border-radius: 30px; display: flex; align-items: center; padding: 5px 10px 5px 15px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .input-wrapper input { flex: 1; background: transparent; border: none; color: white; padding: 12px 5px; outline: none; font-size: 16px; }
         .icon-btn { background: none; border: none; color: white; cursor: pointer; padding: 8px; font-size: 18px; }
         .send-text { color: #d8b4fe; font-weight: 600; font-size: 14px; margin-right: 5px; }
         .mic-btn { background: #7c3aed; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
@@ -108,31 +84,29 @@
 </head>
 <body>
 
-    <div class="container">
-        <div class="chat-box" id="chatBox">
-            <div id="main-ui">
-                <div class="orb"></div>
-                <div class="welcome-text">
-                    <h2>Hey 👋, Sir</h2>
-                    <div class="tagline">Your Personal AI Assistant</div>
-                    <p>Ready to generate image, schedule meetings, or just chat.</p>
-                </div>
-                <div class="grid-container">
-                    <div class="card"><span class="card-icon">🖼️</span><span class="card-title">Generate Image</span><span class="card-desc">Instantly bring ideas to life</span></div>
-                    <div class="card"><span class="card-icon">🎥</span><span class="card-title">Create Video</span><span class="card-desc">Effortless reels with AI</span></div>
-                    <div class="card"><span class="card-icon">📝</span><span class="card-title">Summarise Text</span><span class="card-desc">Essential info in few words</span></div>
-                    <div class="card"><span class="card-icon">📄</span><span class="card-title">CV Builder</span><span class="card-desc">Create your own CV</span></div>
-                </div>
+    <div id="chatBox">
+        <div id="main-ui">
+            <div class="orb"></div>
+            <div class="welcome-text">
+                <h2>Hey 👋, Sir</h2>
+                <div class="tagline">Your Personal AI Assistant</div>
+                <p>Ready to generate image, schedule meetings, or just chat.</p>
             </div>
+            <div class="grid-container">
+                <div class="card"><span class="card-icon">🖼️</span><span class="card-title">Generate Image</span><span class="card-desc">Instantly bring ideas to life</span></div>
+                <div class="card"><span class="card-icon">🎥</span><span class="card-title">Create Video</span><span class="card-desc">Effortless reels with AI</span></div>
+                <div class="card"><span class="card-icon">📝</span><span class="card-title">Summarise Text</span><span class="card-desc">Essential info in few words</span></div>
+                <div class="card"><span class="card-icon">📄</span><span class="card-title">CV Builder</span><span class="card-desc">Create your own CV</span></div>
             </div>
+        </div>
+    </div>
 
-        <div class="input-area" id="inputArea">
-            <div class="input-wrapper">
-                <button class="icon-btn">📷</button>
-                <input type="text" id="userInput" placeholder="Ask J.A.R.V.I.S..." autocomplete="off" />
-                <button class="icon-btn send-text" onclick="sendMessage()">SEND</button>
-                <button class="icon-btn mic-btn">🎤</button>
-            </div>
+    <div id="inputArea">
+        <div class="input-wrapper">
+            <button class="icon-btn">📷</button>
+            <input type="text" id="userInput" placeholder="Ask J.A.R.V.I.S..." autocomplete="off" />
+            <button class="icon-btn send-text" onclick="sendMessage()">SEND</button>
+            <button class="icon-btn mic-btn">🎤</button>
         </div>
     </div>
 
@@ -175,7 +149,6 @@
                 });
                 const data = await response.json();
                 
-                // Streaming Effect + Markdown
                 const fullText = data.reply;
                 let index = 0;
                 jDiv.innerHTML = ""; 
@@ -199,12 +172,10 @@
 
         input.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
         
-        // Jab bhi input par tap ho, thodi der baad niche scroll kardo taaki messages upar aa jayein
+        // Mobile par input open hone par scroll fix
         input.addEventListener('focus', () => {
             setTimeout(scrollToBottom, 300);
         });
-
-        // ❌ MAINE YAHAN SE WO DOUBLE-JUMP KARNE WALI JAVASCRIPT HATA DI HAI ❌
     </script>
 </body>
 </html>
