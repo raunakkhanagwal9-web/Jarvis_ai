@@ -10,100 +10,85 @@
     <style>
         /* 🔥 RESET */
         * { box-sizing: border-box; }
+
         :root {
             --bg-gradient: radial-gradient(circle at top, #2a1b3d 0%, #050505 100%);
             --card-bg: rgba(255, 255, 255, 0.05);
         }
 
-        /* 1. Body ko lock kiya taaki over-scroll na ho */
         html, body {
             margin: 0; padding: 0;
             height: 100%; 
-            overflow: hidden;
+            overflow: hidden; /* Screen hilne se rokega */
             font-family: 'SF Pro Display', -apple-system, sans-serif;
             background: #050505;
             color: white;
         }
 
-        /* 2. Main Container Flex Column - Height 100dvh jo keyboard ke sath khud adjust hoga */
+        /* 🔥 MAIN CONTAINER */
         .container {
-            height: 100dvh; 
+            height: 100dvh; /* dynamic height fix */
             display: flex;
             flex-direction: column;
             background: var(--bg-gradient);
         }
 
-        /* 3. Chat Area - Sirf ye hissa shrink hoga aur scroll karega */
+        /* 🔥 CHAT AREA */
         .chat-box {
-            flex: 1; /* Bachi hui saari jagah lega */
+            flex: 1;
             overflow-y: auto;
             padding: 15px;
+            padding-bottom: 90px; /* 👇 input bar ke liye space (Aapka code) */
             scroll-behavior: smooth;
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
 
-        #main-ui {
-            text-align: center;
-            padding-top: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .orb {
-            width: 90px; height: 90px;
-            background: radial-gradient(circle, #d8b4fe 0%, #a855f7 50%, #6366f1 100%);
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            filter: blur(5px);
-            box-shadow: 0 0 40px rgba(168, 85, 247, 0.6);
-            animation: pulse 4s infinite alternate;
-        }
-
-        @keyframes pulse {
-            from { transform: scale(1); opacity: 0.8; }
-            to { transform: scale(1.1); opacity: 1; box-shadow: 0 0 60px rgba(168, 85, 247, 0.9); }
-        }
-
+        /* --- Welcome UI --- */
+        #main-ui { text-align: center; padding-top: 20px; display: flex; flex-direction: column; }
+        .orb { width: 90px; height: 90px; background: radial-gradient(circle, #d8b4fe 0%, #a855f7 50%, #6366f1 100%); border-radius: 50%; margin: 0 auto 20px; filter: blur(5px); box-shadow: 0 0 40px rgba(168, 85, 247, 0.6); animation: pulse 4s infinite alternate; }
+        @keyframes pulse { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.1); opacity: 1; box-shadow: 0 0 60px rgba(168, 85, 247, 0.9); } }
+        
         .welcome-text h2 { margin: 0; font-size: 26px; font-weight: 600; }
         .welcome-text .tagline { font-size: 16px; font-weight: bold; color: white; margin: 8px 0; }
         .welcome-text p { font-size: 13px; color: #9ca3af; margin: 0 auto; max-width: 250px; line-height: 1.4; }
 
-        .grid-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        .card { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
+        .card { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 6px; backdrop-filter: blur(10px); text-align: left; }
         .card-icon { font-size: 20px; }
         .card-title { font-weight: 600; font-size: 14px; }
-        .card-desc { font-size: 11px; color: #9ca3af; }
+        .card-desc { font-size: 11px; color: #9ca3af; line-height: 1.3; }
 
         /* 🔥 MESSAGES */
         .message { max-width: 85%; padding: 12px 16px; border-radius: 20px; word-wrap: break-word; font-size: 15px; line-height: 1.5; }
-        .message p { margin: 0 0 10px 0; }
-        .message p:last-child { margin: 0; }
-        .message ul, .message ol { margin: 5px 0; padding-left: 20px; }
-        .message strong { color: #d8b4fe; }
+        .message p { margin: 0 0 10px 0; } .message p:last-child { margin: 0; }
+        .message ul, .message ol { margin: 5px 0; padding-left: 20px; } .message strong { color: #d8b4fe; }
+        .message pre { background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; overflow-x: auto; font-size: 13px; }
+        .message code { background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 4px; font-family: monospace; }
         .bot { background: rgba(255,255,255,0.1); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
         .user { background: #7c3aed; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
 
-        /* 4. INPUT AREA - FIXED HATA DIYA! Ye natural flow mein bottom par rahega */
+        /* 🔥 INPUT AREA (SEARCH BAR FIXED - EXACTLY AAPKA CODE) */
         .input-area {
-            flex-shrink: 0; /* Keyboard khulne par ye dabe/sikude na */
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
             display: flex;
             align-items: center;
+            gap: 8px;
             padding: 10px 15px;
-            background: #050505;
+            background: #050505; /* Black background taaki messages peeche se na dikhein */
             border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding-bottom: max(10px, env(safe-area-inset-bottom));
+            padding-bottom: calc(10px + env(safe-area-inset-bottom));
+            z-index: 1000;
         }
 
         .input-wrapper {
             width: 100%;
             background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(25px);
             border-radius: 30px;
             display: flex;
             align-items: center;
@@ -111,7 +96,10 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .input-wrapper input { flex: 1; background: transparent; border: none; color: white; padding: 12px 5px; outline: none; font-size: 16px; }
+        .input-wrapper input {
+            flex: 1; background: transparent; border: none; color: white;
+            padding: 12px 5px; outline: none; font-size: 16px;
+        }
         .icon-btn { background: none; border: none; color: white; cursor: pointer; padding: 8px; font-size: 18px; }
         .send-text { color: #d8b4fe; font-weight: 600; font-size: 14px; margin-right: 5px; }
         .mic-btn { background: #7c3aed; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
@@ -187,6 +175,7 @@
                 });
                 const data = await response.json();
                 
+                // Streaming Effect + Markdown
                 const fullText = data.reply;
                 let index = 0;
                 jDiv.innerHTML = ""; 
@@ -210,12 +199,12 @@
 
         input.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
         
-        // Sirf scroll karne ki script rakhi hai, resize wali hata di
+        // Jab bhi input par tap ho, thodi der baad niche scroll kardo taaki messages upar aa jayein
         input.addEventListener('focus', () => {
             setTimeout(scrollToBottom, 300);
         });
-        
-        // Puraana Javascript block (VisualViewport) yahan se completely DELETE kar diya gaya hai.
+
+        // ❌ MAINE YAHAN SE WO DOUBLE-JUMP KARNE WALI JAVASCRIPT HATA DI HAI ❌
     </script>
 </body>
 </html>
