@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>J.A.R.V.I.S. | Personal AI</title>
     <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <style>
         :root {
             --bg-gradient: radial-gradient(circle at top, #2a1b3d 0%, #050505 100%);
@@ -23,10 +26,9 @@
             overflow: hidden;
         }
 
-        /* Home UI Section */
         #main-ui {
             text-align: center;
-            padding: 40px 20px 20px; /* Reduced top padding */
+            padding: 40px 20px 20px;
             flex-grow: 1;
             display: flex;
             flex-direction: column;
@@ -36,7 +38,7 @@
             width: 90px; height: 90px;
             background: radial-gradient(circle, #d8b4fe 0%, #a855f7 50%, #6366f1 100%);
             border-radius: 50%;
-            margin: 0 auto 20px; /* Reduced margin */
+            margin: 0 auto 20px;
             filter: blur(5px);
             box-shadow: 0 0 40px rgba(168, 85, 247, 0.6);
             animation: pulse 4s infinite alternate;
@@ -52,14 +54,13 @@
         .welcome-text .tagline { font-size: 16px; font-weight: bold; color: white; margin: 8px 0; }
         .welcome-text p { font-size: 13px; color: #9ca3af; margin: 0 auto; max-width: 250px; line-height: 1.4; }
 
-        /* Grid - Shifted Higher */
         .grid-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
-            padding: 10px; /* Reduced padding */
-            margin-top: 20px; /* Added controlled margin to move it up */
-            margin-bottom: 80px; /* Space for input bar */
+            padding: 10px;
+            margin-top: 20px;
+            margin-bottom: 80px;
         }
 
         .card {
@@ -78,7 +79,6 @@
         .card-title { font-weight: 600; font-size: 14px; }
         .card-desc { font-size: 11px; color: #9ca3af; line-height: 1.3; }
 
-        /* Chat History */
         #chat-history {
             display: none;
             flex-grow: 1;
@@ -89,11 +89,18 @@
             padding-bottom: 100px;
         }
 
-        .msg { max-width: 85%; padding: 12px 16px; border-radius: 20px; font-size: 15px; line-height: 1.4; }
+        /* MARKDOWN STRUCTURED STYLES */
+        .msg { max-width: 85%; padding: 12px 16px; border-radius: 20px; font-size: 15px; line-height: 1.5; }
+        .msg p { margin: 0 0 10px 0; }
+        .msg p:last-child { margin: 0; }
+        .msg ul, .msg ol { margin: 5px 0; padding-left: 20px; }
+        .msg strong { color: #d8b4fe; } /* Bold text ko purple tint */
+        .msg pre { background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; overflow-x: auto; font-family: monospace; font-size: 13px; }
+        .msg code { background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 4px; font-family: monospace; }
+        
         .user-msg { align-self: flex-end; background: #7c3aed; border-bottom-right-radius: 4px; }
         .jarvis-msg { align-self: flex-start; background: rgba(255,255,255,0.1); border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
 
-        /* Floating Input Bar */
         .bottom-nav {
             padding: 10px 15px;
             position: fixed;
@@ -125,7 +132,6 @@
         .icon-btn { background: none; border: none; color: white; cursor: pointer; padding: 8px; font-size: 18px; }
         .send-text { color: #d8b4fe; font-weight: 600; font-size: 14px; margin-right: 5px; }
         .mic-btn { background: #7c3aed; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-
     </style>
 </head>
 <body>
@@ -133,7 +139,8 @@
     <div id="main-ui">
         <div class="orb"></div>
         <div class="welcome-text">
-            <h2>Hey👋, Sir</h2> <div class="tagline">Your Personal AI Assistant</div>
+            <h2>Hey 👋, Sir</h2>
+            <div class="tagline">Your Personal AI Assistant</div>
             <p>Ready to generate image, schedule meetings, or just chat.</p>
         </div>
 
@@ -190,10 +197,27 @@
                     body: JSON.stringify({ query: query })
                 });
                 const data = await response.json();
-                jDiv.innerText = data.reply;
-            } catch (e) { jDiv.innerText = "Sir, connection lost."; }
+                
+                // STREAMING EFFECT + MARKDOWN
+                const fullText = data.reply;
+                let index = 0;
+                jDiv.innerHTML = ""; // Purana '...' clear karo
+                
+                // Har 15 milliseconds mein naya word add hoga
+                const typer = setInterval(() => {
+                    if (index <= fullText.length) {
+                        jDiv.innerHTML = marked.parse(fullText.substring(0, index));
+                        chatHistory.scrollTop = chatHistory.scrollHeight;
+                        index += 3; // Typing speed (is number ko badha/ghata sakte ho)
+                    } else {
+                        clearInterval(typer);
+                        jDiv.innerHTML = marked.parse(fullText); // Final format render
+                    }
+                }, 15);
 
-            chatHistory.scrollTop = chatHistory.scrollHeight;
+            } catch (e) { 
+                jDiv.innerText = "Sir, connection lost."; 
+            }
         }
 
         input.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
