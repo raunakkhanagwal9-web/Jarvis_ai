@@ -8,50 +8,42 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
-        /* 🔥 RESET (Aapka Code) */
-        * {
-            box-sizing: border-box;
-        }
-
+        /* 🔥 RESET */
+        * { box-sizing: border-box; }
         :root {
             --bg-gradient: radial-gradient(circle at top, #2a1b3d 0%, #050505 100%);
             --card-bg: rgba(255, 255, 255, 0.05);
         }
 
+        /* 1. Body ko lock kiya taaki over-scroll na ho */
         html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
+            margin: 0; padding: 0;
+            height: 100%; 
             overflow: hidden;
             font-family: 'SF Pro Display', -apple-system, sans-serif;
             background: #050505;
             color: white;
         }
 
-        /* 🔥 MAIN CONTAINER (Aapka Code) */
+        /* 2. Main Container Flex Column - Height 100dvh jo keyboard ke sath khud adjust hoga */
         .container {
-            height: 100dvh; /* dynamic height fix */
+            height: 100dvh; 
             display: flex;
             flex-direction: column;
             background: var(--bg-gradient);
         }
 
-        /* 🔥 CHAT AREA (Aapka Code) */
+        /* 3. Chat Area - Sirf ye hissa shrink hoga aur scroll karega */
         .chat-box {
-            flex: 1;
+            flex: 1; /* Bachi hui saari jagah lega */
             overflow-y: auto;
             padding: 15px;
-            /* 👇 input bar ke liye space */
-            padding-bottom: 90px;
-            /* smooth scroll */
             scroll-behavior: smooth;
-            
             display: flex;
             flex-direction: column;
             gap: 15px;
         }
 
-        /* --- J.A.R.V.I.S. Welcome UI Styles --- */
         #main-ui {
             text-align: center;
             padding-top: 20px;
@@ -84,76 +76,34 @@
             gap: 15px;
             margin-top: 30px;
         }
-        .card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 18px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            backdrop-filter: blur(10px);
-            text-align: left;
-        }
+        .card { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 6px; text-align: left; }
         .card-icon { font-size: 20px; }
         .card-title { font-weight: 600; font-size: 14px; }
-        .card-desc { font-size: 11px; color: #9ca3af; line-height: 1.3; }
+        .card-desc { font-size: 11px; color: #9ca3af; }
 
-        /* 🔥 MESSAGES (Aapka Code + Jarvis Design) */
-        .message {
-            max-width: 85%;
-            padding: 12px 16px;
-            border-radius: 20px;
-            word-wrap: break-word;
-            font-size: 15px;
-            line-height: 1.5;
-        }
-        
-        /* Markdown Styles */
+        /* 🔥 MESSAGES */
+        .message { max-width: 85%; padding: 12px 16px; border-radius: 20px; word-wrap: break-word; font-size: 15px; line-height: 1.5; }
         .message p { margin: 0 0 10px 0; }
         .message p:last-child { margin: 0; }
         .message ul, .message ol { margin: 5px 0; padding-left: 20px; }
         .message strong { color: #d8b4fe; }
-        .message pre { background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; overflow-x: auto; font-size: 13px; }
-        .message code { background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 4px; font-family: monospace; }
+        .bot { background: rgba(255,255,255,0.1); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
+        .user { background: #7c3aed; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
 
-        /* bot message */
-        .bot {
-            background: rgba(255,255,255,0.1);
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        /* user message */
-        .user {
-            background: #7c3aed;
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-
-        /* 🔥 INPUT AREA (SEARCH BAR FIXED - Aapka Code + Dark Theme) */
+        /* 4. INPUT AREA - FIXED HATA DIYA! Ye natural flow mein bottom par rahega */
         .input-area {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
+            flex-shrink: 0; /* Keyboard khulne par ye dabe/sikude na */
             display: flex;
             align-items: center;
-            gap: 8px;
             padding: 10px 15px;
             background: #050505;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
-            /* 🔥 SAFE AREA (important for mobile) */
-            padding-bottom: calc(10px + env(safe-area-inset-bottom));
-            z-index: 1000;
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
         }
 
         .input-wrapper {
             width: 100%;
             background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(25px);
             border-radius: 30px;
             display: flex;
             align-items: center;
@@ -161,17 +111,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* INPUT FIELD */
-        .input-wrapper input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            padding: 12px 5px;
-            outline: none;
-            font-size: 16px;
-        }
-
+        .input-wrapper input { flex: 1; background: transparent; border: none; color: white; padding: 12px 5px; outline: none; font-size: 16px; }
         .icon-btn { background: none; border: none; color: white; cursor: pointer; padding: 8px; font-size: 18px; }
         .send-text { color: #d8b4fe; font-weight: 600; font-size: 14px; margin-right: 5px; }
         .mic-btn { background: #7c3aed; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
@@ -181,9 +121,7 @@
 <body>
 
     <div class="container">
-
         <div class="chat-box" id="chatBox">
-            
             <div id="main-ui">
                 <div class="orb"></div>
                 <div class="welcome-text">
@@ -198,7 +136,6 @@
                     <div class="card"><span class="card-icon">📄</span><span class="card-title">CV Builder</span><span class="card-desc">Create your own CV</span></div>
                 </div>
             </div>
-
             </div>
 
         <div class="input-area" id="inputArea">
@@ -209,7 +146,6 @@
                 <button class="icon-btn mic-btn">🎤</button>
             </div>
         </div>
-
     </div>
 
     <script>
@@ -225,12 +161,10 @@
             const query = input.value.trim();
             if (!query) return;
 
-            // Hide main UI on first message
             if (mainUi.style.display !== 'none') {
                 mainUi.style.display = 'none';
             }
 
-            // User Message
             const uDiv = document.createElement('div');
             uDiv.className = 'message user';
             uDiv.innerText = query;
@@ -239,7 +173,6 @@
             input.value = '';
             scrollToBottom();
 
-            // Jarvis Placeholder
             const jDiv = document.createElement('div');
             jDiv.className = 'message bot';
             jDiv.innerText = "...";
@@ -254,7 +187,6 @@
                 });
                 const data = await response.json();
                 
-                // Streaming Effect + Markdown
                 const fullText = data.reply;
                 let index = 0;
                 jDiv.innerHTML = ""; 
@@ -278,20 +210,12 @@
 
         input.addEventListener('keypress', (e) => { if(e.key === 'Enter') sendMessage(); });
         
-        // Input focus hone par turant scroll kare
+        // Sirf scroll karne ki script rakhi hai, resize wali hata di
         input.addEventListener('focus', () => {
             setTimeout(scrollToBottom, 300);
         });
         
-        // Visual Viewport Script jo pichli baar dikkat kar rahi thi usko nikaal diya hai, 
-        // kyunki aapka diya hua CSS isko bina script ke fix kar deta hai.
-        if ('visualViewport' in window) {
-            window.visualViewport.addEventListener('resize', () => {
-                const inputArea = document.getElementById('inputArea');
-                inputArea.style.bottom = `${window.innerHeight - window.visualViewport.height}px`;
-                scrollToBottom();
-            });
-        }
+        // Puraana Javascript block (VisualViewport) yahan se completely DELETE kar diya gaya hai.
     </script>
 </body>
 </html>
