@@ -6,15 +6,20 @@ import requests
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'jarvis_stark_999'
+
+# Security & Path Config
+app.config['SECRET_KEY'] = os.environ.get("SECRET_KEY", "stark_industries_secret")
 basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'users.db')
+# Database file ko permanent storage path dena zaroori hai
+db_path = os.path.join(basedir, 'users.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
+# User Table
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
@@ -24,6 +29,14 @@ class User(UserMixin, db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# Create Database Function
+def init_db():
+    with app.app_context():
+        if not os.path.exists(db_path):
+            db.create_all()
+            print("Database created successfully!")
+
+# Routes
 @app.route('/')
 @login_required
 def home():
@@ -38,7 +51,7 @@ def login():
         if user and check_password_hash(user.password, password):
             login_user(user)
             return redirect(url_for('home'))
-        flash('Invalid credentials, Sir.')
+        flash('Identification failed. Try again, Sir.')
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -47,7 +60,7 @@ def register():
         username = request.form.get('username')
         password = request.form.get('password')
         if User.query.filter_by(username=username).first():
-            flash('Username exists!')
+            flash('This identity already exists, Sir.')
             return redirect(url_for('register'))
         new_user = User(username=username, password=generate_password_hash(password, method='pbkdf2:sha256'))
         db.session.add(new_user)
@@ -67,18 +80,17 @@ def ask():
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
-            {"role": "system", "content": f"You are J.A.R.V.I.S. Respond to {current_user.username} Sir. Be witty and use Hinglish."}
+            {"role": "system", "content": f"You are J.A.R.V.I.S. Respond to {current_user.username} Sir. Be witty, use Hinglish and structure your output."}
         ] + [{"role": "user", "content": user_query}]
     }
     try:
         res = requests.post(url, headers=headers, json=payload)
         return jsonify({'reply': res.json()['choices'][0]['message']['content']})
     except:
-        return jsonify({'reply': "Error, Sir."})
+        return jsonify({'reply': "Protocol error, Sir."})
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()
+    init_db()
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-    
+        
