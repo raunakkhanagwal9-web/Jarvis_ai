@@ -6,78 +6,93 @@
     <title>J.A.R.V.I.S. | Register</title>
     <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at top, #2a1b3d 0%, #050505 100%);
+            --accent-purple: #a855f7;
+        }
         body { 
-            background: radial-gradient(circle at top, #2a1b3d 0%, #050505 100%); 
+            background: var(--bg-gradient); 
             color: white; 
             font-family: 'SF Pro Display', sans-serif; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            height: 100vh; 
+            height: 100dvh; 
             margin: 0; 
+            overflow: hidden;
         }
         .register-card { 
-            background: rgba(255,255,255,0.05); 
-            padding: 40px; 
-            border-radius: 20px; 
-            border: 1px solid #a855f7; 
+            background: rgba(255, 255, 255, 0.03); 
+            padding: 40px 30px; 
+            border-radius: 24px; 
+            border: 1px solid rgba(168, 85, 247, 0.3); 
             text-align: center; 
-            width: 90%;
-            max-width: 350px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 30px rgba(168,85,247,0.2); 
+            width: 85%;
+            max-width: 380px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
-        h2 { margin-bottom: 20px; font-weight: 600; letter-spacing: 1px; }
+        .mini-orb {
+            width: 60px; height: 60px;
+            background: radial-gradient(circle, #d8b4fe 0%, #a855f7 50%, #6366f1 100%);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            filter: blur(2px);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
+        }
+        h2 { margin: 0 0 10px; font-weight: 600; font-size: 24px; }
+        p.subtitle { color: #9ca3af; font-size: 14px; margin-bottom: 30px; }
+        
         input { 
             width: 100%; 
-            padding: 14px; 
-            margin: 10px 0; 
-            border-radius: 12px; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            background: rgba(0,0,0,0.5); 
+            padding: 15px; 
+            border-radius: 14px; 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            background: rgba(0, 0, 0, 0.3); 
             color: white; 
             outline: none;
             font-size: 16px;
+            margin-bottom: 15px;
         }
-        input:focus { border-color: #a855f7; }
+        input:focus { border-color: var(--accent-purple); }
+        
         button { 
             width: 100%; 
-            padding: 14px; 
-            margin-top: 15px;
-            border-radius: 12px; 
+            padding: 15px; 
+            border-radius: 14px; 
             border: none; 
             background: #7c3aed; 
             color: white; 
-            font-weight: bold; 
+            font-weight: 600; 
             font-size: 16px;
             cursor: pointer; 
-            transition: 0.3s;
         }
-        button:active { transform: scale(0.98); }
-        .links { margin-top: 20px; font-size: 13px; color: #9ca3af; }
-        a { color: #d8b4fe; text-decoration: none; font-weight: bold; }
-        .flash-msg { color: #ff4d4d; font-size: 13px; margin-bottom: 10px; }
+        .footer-links { margin-top: 25px; font-size: 14px; color: #9ca3af; }
+        a { color: #d8b4fe; text-decoration: none; font-weight: 600; }
+        .flash { color: #ef4444; font-size: 13px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
     <div class="register-card">
-        <h2>New Protocol</h2>
+        <div class="mini-orb"></div>
+        <h2>Create Identity</h2>
+        <p class="subtitle">Initialize User Protocol</p>
         
         {% with messages = get_flashed_messages() %}
           {% if messages %}
             {% for message in messages %}
-              <div class="flash-msg">{{ message }}</div>
+              <div class="flash">{{ message }}</div>
             {% endfor %}
           {% endif %}
         {% endwith %}
 
         <form method="POST">
             <input type="text" name="username" placeholder="Choose Username" required autocomplete="off">
-            <input type="password" name="password" placeholder="Create Password" required>
-            <button type="submit">Create Identity</button>
+            <input type="password" name="password" placeholder="Create Passcode" required>
+            <button type="submit">Initialize</button>
         </form>
-        <div class="links">
-            Already have an account? <a href="/login">Login here</a>
+        <div class="footer-links">
+            Existing user? <a href="/login">Verify Identity</a>
         </div>
     </div>
 </body>
