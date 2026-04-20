@@ -1,5 +1,5 @@
 Flask
+Flask-SQLAlchemy
+Flask-Login
 requests
-flask-sqlalchemy
-flask-login
 gunicorn
