@@ -37,8 +37,8 @@ def create_tables():
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
-    client_id='869230187120-5531gadmiu9arhb2nsi9p5dkdqqj7elf.apps.googleusercontent.com'
-    client_secret='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'
+    client_id='869230187120-5531gadmiu9arhb2nsi9p5dkdqqj7elf.apps.googleusercontent.com',
+    client_secret='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',
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
     client_kwargs={'scope': 'openid email profile'}
 )
