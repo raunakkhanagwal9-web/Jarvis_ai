@@ -2,11 +2,16 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.middleware.proxy_fix import ProxyFix  # NAYA IMPORT (Render Fix)
 import requests
 import os
 from authlib.integrations.flask_client import OAuth
 
 app = Flask(__name__)
+
+# NAYA FIX: Render ke HTTPS issue ko solve karne ke liye
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
 app.config['SECRET_KEY'] = 'jarvis_secret_protocol_101'
 
 # Render-specific database path fix
@@ -37,8 +42,8 @@ def create_tables():
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
-    client_id='869230187120-5531gadmiu9arhb2nsi9p5dkdqqj7elf.apps.googleusercontent.com',
-    client_secret='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',
+    client_id='869230187120-5531gadmiu9arhb2nsi9p5dkdqqj7elf.apps.googleusercontent.com',     # <-- APNI ID WAPAS DAALO
+    client_secret='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',    # <-- APNA SECRET WAPAS DAALO
     server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
     client_kwargs={'scope': 'openid email profile'}
 )
@@ -70,27 +75,33 @@ def login():
 # --- GOOGLE LOGIN ROUTES ---
 @app.route('/login/google')
 def google_login():
-    redirect_uri = url_for('google_authorize', _external=True)
+    # NAYA FIX: Zabardasti HTTPS par redirect karwana
+    redirect_uri = url_for('google_authorize', _external=True, _scheme='https')
     return google.authorize_redirect(redirect_uri)
 
 @app.route('/login/google/authorize')
 def google_authorize():
+    # Token receive karna
     token = google.authorize_access_token()
-    user_info = google.get('https://openidconnect.googleapis.com/v1/userinfo').json()
+    
+    # User ki details token se nikalna (Safe method)
+    user_info = token.get('userinfo')
+    if not user_info:
+        resp = google.get('https://openidconnect.googleapis.com/v1/userinfo')
+        user_info = resp.json()
     
     email = user_info.get('email')
-    name = user_info.get('name')
+    name = user_info.get('name', 'Jarvis User')
 
-    # Check agar user pehle se database mein hai
+    # Check agar user pehle se hai
     user = User.query.filter_by(email=email).first()
     if not user:
-        # Agar naya user hai, toh account bana do (Google users ko password ki zaroorat nahi)
+        # Naya user create karo
         hashed_pw = generate_password_hash("google_oauth_bypass", method='pbkdf2:sha256')
         user = User(email=email, username=name, password=hashed_pw)
         db.session.add(user)
         db.session.commit()
     
-    # Login kara do
     login_user(user)
     return redirect(url_for('home'))
 
@@ -101,7 +112,6 @@ def register():
         username = request.form.get('username').strip()
         password = request.form.get('password').strip()
         
-        # Error Handling
         if len(password) < 6:
             flash('Password too short (Minimum 6 characters), Sir.')
             return redirect(url_for('register'))
