@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>J.A.R.V.I.S. | Identification</title>
+    <title>J.A.R.V.I.S. | Login</title>
     <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -11,13 +11,10 @@
             --accent-purple: #a855f7;
             --glass-bg: rgba(255, 255, 255, 0.03);
         }
-
-        * { box-sizing: border-box; }
-
         body { 
             background: var(--bg-gradient); 
             color: white; 
-            font-family: 'SF Pro Display', -apple-system, sans-serif; 
+            font-family: 'SF Pro Display', sans-serif; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -25,7 +22,6 @@
             margin: 0; 
             overflow: hidden;
         }
-
         .login-card { 
             background: var(--glass-bg); 
             padding: 40px 30px; 
@@ -35,45 +31,33 @@
             width: 85%;
             max-width: 400px;
             backdrop-filter: blur(25px);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 20px rgba(168, 85, 247, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            box-sizing: border-box;
         }
-
         .mini-orb {
             width: 60px; height: 60px;
             background: radial-gradient(circle, #d8b4fe 0%, #a855f7 50%, #6366f1 100%);
             border-radius: 50%;
             margin: 0 auto 20px;
-            filter: blur(2px);
             box-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
-            animation: pulse 4s infinite alternate;
         }
-
-        @keyframes pulse {
-            from { transform: scale(1); opacity: 0.8; }
-            to { transform: scale(1.1); opacity: 1; }
-        }
-
-        h2 { margin: 0; font-weight: 600; font-size: 24px; letter-spacing: 0.5px; }
+        h2 { margin: 0; font-weight: 600; font-size: 24px; }
         p.subtitle { color: #9ca3af; font-size: 14px; margin: 10px 0 30px; }
         
-        .input-group { position: relative; margin-bottom: 20px; text-align: left; }
-        
+        .input-group { position: relative; margin-bottom: 15px; }
         input { 
             width: 100%; 
             padding: 15px; 
-            padding-right: 45px; /* space for eye icon */
             border-radius: 14px; 
             border: 1px solid rgba(255, 255, 255, 0.1); 
             background: rgba(0, 0, 0, 0.3); 
             color: white; 
             outline: none;
             font-size: 16px;
-            transition: 0.3s;
+            box-sizing: border-box;
         }
-
-        input:focus { border-color: var(--accent-purple); background: rgba(0, 0, 0, 0.5); }
+        input:focus { border-color: var(--accent-purple); }
         
-        /* 🔥 EYE ICON STYLING */
         .toggle-password {
             position: absolute;
             right: 15px;
@@ -81,12 +65,9 @@
             transform: translateY(-50%);
             cursor: pointer;
             color: var(--accent-purple);
-            font-size: 18px;
-            user-select: none;
-            z-index: 10;
         }
 
-        button { 
+        button.main-btn { 
             width: 100%; 
             padding: 15px; 
             border-radius: 14px; 
@@ -96,34 +77,40 @@
             font-weight: 600; 
             font-size: 16px;
             cursor: pointer; 
-            transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
             margin-top: 10px;
+            box-sizing: border-box;
+        }
+        .flash { color: #ef4444; font-size: 13px; margin-bottom: 15px; background: rgba(239,68,68,0.1); padding: 8px; border-radius: 8px; }
+        
+        .divider {
+            margin-top: 20px; 
+            border-top: 1px solid rgba(255,255,255,0.1); 
+            padding-top: 20px;
+        }
+        
+        .google-btn {
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            background: white; 
+            color: black; 
+            padding: 12px; 
+            border-radius: 14px; 
+            font-weight: 600; 
+            text-decoration: none; 
+            transition: 0.3s; 
+            box-shadow: 0 4px 15px rgba(255,255,255,0.1);
         }
 
-        button:active { transform: scale(0.97); }
-        
-        .footer-links { margin-top: 25px; font-size: 14px; color: #9ca3af; }
+        .links { margin-top: 20px; font-size: 14px; color: #9ca3af; }
         a { color: #d8b4fe; text-decoration: none; font-weight: 600; }
-        
-        /* 🔥 FLASH MESSAGE STYLING */
-        .flash { 
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444; 
-            font-size: 13px; 
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
     </style>
 </head>
 <body>
-
     <div class="login-card">
         <div class="mini-orb"></div>
-        <h2>Identify Yourself</h2>
-        <p class="subtitle">Secure Access Protocol</p>
+        <h2>Welcome Back, Sir</h2>
+        <p class="subtitle">Verify Identity to access J.A.R.V.I.S.</p>
         
         {% with messages = get_flashed_messages() %}
           {% if messages %}
@@ -135,35 +122,37 @@
 
         <form method="POST">
             <div class="input-group">
-                <input type="email" name="email" placeholder="Email Address" required autocomplete="email">
+                <input type="email" name="email" placeholder="Email Address" required autocomplete="off">
             </div>
-            
             <div class="input-group">
-                <input type="password" name="password" id="passInput" placeholder="Passcode" required>
-                <span class="toggle-password" onclick="togglePass()">👁️</span>
+                <input type="password" name="password" id="logPass" placeholder="Passcode" required>
+                <span class="toggle-password" onclick="toggleLogPass()">👁️</span>
             </div>
-            
-            <button type="submit">Verify Identity</button>
+            <button type="submit" class="main-btn">Verify Identity</button>
         </form>
 
-        <div class="footer-links">
-            <a href="#" style="display: block; margin-bottom: 10px; font-size: 12px; opacity: 0.7;">Forgot Passcode?</a>
-            New user? <a href="/register">Initialize Identity</a>
+        <div class="divider">
+            <a href="/login/google" class="google-btn">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" style="width: 20px; margin-right: 10px;">
+                Continue with Google
+            </a>
+        </div>
+
+        <div class="links">
+            No access yet? <a href="/register">Initialize here</a>
         </div>
     </div>
 
     <script>
-        // 🔥 JAVASCRIPT FOR VIEW/HIDE PASSWORD
-        function togglePass() {
-            const passInput = document.getElementById('passInput');
-            const eyeIcon = document.querySelector('.toggle-password');
-            
-            if (passInput.type === 'password') {
-                passInput.type = 'text';
-                eyeIcon.innerText = '🙈'; // Hide icon
+        function toggleLogPass() {
+            const p = document.getElementById('logPass');
+            const icon = document.querySelector('.toggle-password');
+            if (p.type === "password") {
+                p.type = "text";
+                icon.innerText = "🙈";
             } else {
-                passInput.type = 'password';
-                eyeIcon.innerText = '👁️'; // Show icon
+                p.type = "password";
+                icon.innerText = "👁️";
             }
         }
     </script>
