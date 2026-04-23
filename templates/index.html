@@ -204,6 +204,26 @@ strong {
             });
         }
 
+        async function clearHistory() {
+    // Sirf confirm karne par hi delete hoga
+    if(confirm("Sir, are you sure? Pura history data delete ho jayega.")) {
+        try {
+            const res = await fetch('/delete_history', { method: 'POST' });
+            const data = await res.json();
+            
+            if(data.status === "success") {
+                alert("History cleared, Sir.");
+                location.reload(); // Page refresh karke sidebar saaf kar dega
+            } else {
+                alert("Error: " + data.message);
+            }
+        } catch (e) {
+            alert("Protocol failure. Could not connect to server.");
+        }
+    }
+        }
+        
+
         async function sendMessage() {
             const query = input.value.trim();
             if (!query) return;
