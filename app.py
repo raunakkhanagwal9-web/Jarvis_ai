@@ -180,6 +180,16 @@ def get_history():
             seen.add(clean_q)
     return jsonify({"history": unique_queries[:10]})
 
+@app.route('/delete_history', methods=['POST'])
+@login_required
+def delete_history():
+    try:
+        # User ki saari chats database se uda do
+        chat_db.delete_many({"user_id": current_user.id})
+        return jsonify({"status": "success", "message": "History cleared, Sir."})
+    except:
+        return jsonify({"status": "error", "message": "Protocol failed."})
+        
 @app.route('/logout')
 def logout():
     logout_user()
