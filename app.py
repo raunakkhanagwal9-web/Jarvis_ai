@@ -9,17 +9,18 @@ import os
 from authlib.integrations.flask_client import OAuth
 
 app = Flask(__name__)
+# Render/Proxy support ke liye
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.config['SECRET_KEY'] = 'jarvis_secret_protocol_777'
 
-# --- MONGODB CLOUD SETUP ---
-# ⚠️ Yahan apna asli password dalo <db_password> ki jagah
+# --- ☁️ MONGODB CLOUD SETUP ---
+# Aapka permanent connection link
 app.config["MONGO_URI"] = "mongodb+srv://raunakkhanagwal9_db_user:52Cqed7w1hCkE4xt@cluster0.czmwhtn.mongodb.net/jarvis_db?retryWrites=true&w=majority&appName=Cluster0"
-
 mongo = PyMongo(app)
-db = mongo.db.users # Users collection
+db = mongo.db.users      # Users table
+chat_db = mongo.db.chats # History table
 
-# --- LOGIN MANAGER ---
+# --- 🔐 LOGIN MANAGER ---
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 
@@ -31,10 +32,13 @@ class User(UserMixin):
 
 @login_manager.user_loader
 def load_user(user_id):
-    user_data = db.find_one({"_id": ObjectId(user_id)})
-    return User(user_data) if user_data else None
+    try:
+        user_data = db.find_one({"_id": ObjectId(user_id)})
+        return User(user_data) if user_data else None
+    except:
+        return None
 
-# --- GOOGLE OAUTH SETUP ---
+# --- 🌐 GOOGLE OAUTH SETUP ---
 oauth = OAuth(app)
 google = oauth.register(
     name='google',
@@ -44,7 +48,8 @@ google = oauth.register(
     client_kwargs={'scope': 'openid email profile'}
 )
 
-# --- ROUTES ---
+# --- 🛣️ ROUTES ---
+
 @app.route('/')
 @login_required
 def home():
@@ -62,8 +67,7 @@ def login():
         elif not check_password_hash(user_data['password'], password):
             flash('Invalid passcode, Sir.')
         else:
-            user_obj = User(user_data)
-            login_user(user_obj)
+            login_user(User(user_data))
             return redirect(url_for('home'))
     return render_template('login.html')
 
@@ -108,26 +112,58 @@ def register():
             
         hashed_pw = generate_password_hash(password, method='pbkdf2:sha256')
         db.insert_one({"email": email, "username": username, "password": hashed_pw})
+        flash('Registration successful! Please login.')
         return redirect(url_for('login'))
     return render_template('register.html')
+
+# --- 🧠 AI LOGIC WITH MEMORY ---
 
 @app.route('/ask', methods=['POST'])
 @login_required
 def ask():
     data = request.json
     query = data.get('query')
+    
+    # 1. User ki query save karo database mein
+    chat_db.insert_one({
+        "user_id": current_user.id,
+        "query": query,
+        "role": "user"
+    })
+
+    # 2. Purani history nikalna context ke liye (Last 5 chats)
+    past_chats = list(chat_db.find({"user_id": current_user.id}).sort("_id", -1).limit(6))
+    
+    messages = [{"role": "system", "content": f"You are J.A.R.V.I.S., a highly advanced AI. User is {current_user.username} Sir. Be polite and efficient."}]
+    
+    # History ko sahi order mein lagana
+    for chat in reversed(past_chats):
+        messages.append({"role": "user", "content": chat['query']})
+
     API_KEY = os.environ.get("GROQ_API_KEY")
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
+    
     payload = {
         "model": "llama-3.3-70b-versatile",
-        "messages": [{"role": "system", "content": f"You are J.A.R.V.I.S. User is {current_user.username} Sir."}] + [{"role": "user", "content": query}]
+        "messages": messages,
+        "temperature": 0.7
     }
+    
     try:
         res = requests.post(url, headers=headers, json=payload)
-        return jsonify({'reply': res.json()['choices'][0]['message']['content']})
-    except:
-        return jsonify({'reply': "Protocol error, Sir."})
+        bot_reply = res.json()['choices'][0]['message']['content']
+        return jsonify({'reply': bot_reply})
+    except Exception as e:
+        return jsonify({'reply': "Protocol error, Sir. Check API Connection."})
+
+@app.route('/get_history')
+@login_required
+def get_history():
+    # Sidebar ke liye last 20 queries nikalna
+    history = list(chat_db.find({"user_id": current_user.id}).sort("_id", -1).limit(20))
+    formatted_history = [{"query": h['query']} for h in history]
+    return jsonify({"history": formatted_history})
 
 @app.route('/logout')
 def logout():
@@ -135,5 +171,7 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
-        
+    # Render port handle karne ke liye
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
+    
