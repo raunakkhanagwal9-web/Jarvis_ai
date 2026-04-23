@@ -14,7 +14,8 @@ app.config['SECRET_KEY'] = 'jarvis_secret_protocol_777'
 
 # --- MONGODB CLOUD SETUP ---
 # ⚠️ Yahan apna asli password dalo <db_password> ki jagah
-app.config["MONGO_URI"] = "mongodb+srv://raunakkhanagwal9_db_user:<db_52Cqed7w1hCkE4xt>@cluster0.czmwhtn.mongodb.net/jarvis_db?retryWrites=true&w=majority&appName=Cluster0"
+app.config["MONGO_URI"] = "app.config["MONGO_URI"] = "mongodb+srv://raunakkhanagwal9_db_user:52Cqed7w1hCkE4xt@cluster0.czmwhtn.mongodb.net/jarvis_db?retryWrites=true&w=majority&appName=Cluster0"
+"
 mongo = PyMongo(app)
 db = mongo.db.users # Users collection
 
