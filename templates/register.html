@@ -2,130 +2,141 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>J.A.R.V.I.S. | Register</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S. | Initialize</title>
     <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-gradient: radial-gradient(circle at top, #2a1b3d 0%, #050505 100%);
-            --accent-purple: #a855f7;
-            --glass-bg: rgba(255, 255, 255, 0.03);
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 0;
+            height: 100dvh;
+            display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at top, #1a1025 0%, #050505 100%);
+            font-family: 'SF Pro Display', sans-serif;
+            color: white;
         }
-        body { 
-            background: var(--bg-gradient); 
-            color: white; 
-            font-family: 'SF Pro Display', sans-serif; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100dvh; 
-            margin: 0; 
-            overflow: hidden;
-        }
-        .register-card { 
-            background: var(--glass-bg); 
-            padding: 40px 30px; 
-            border-radius: 24px; 
-            border: 1px solid rgba(168, 85, 247, 0.3); 
-            text-align: center; 
-            width: 85%;
-            max-width: 400px;
-            backdrop-filter: blur(25px);
+
+        .auth-card {
+            width: 90%; max-width: 380px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            padding: 40px 30px;
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: center;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
-        .mini-orb {
-            width: 60px; height: 60px;
-            background: radial-gradient(circle, #d8b4fe 0%, #a855f7 50%, #6366f1 100%);
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            box-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
+
+        .orb-icon {
+            width: 70px; height: 70px;
+            background: radial-gradient(circle, #a855f7 0%, #6366f1 100%);
+            border-radius: 50%; margin: 0 auto 20px;
+            filter: blur(2px); box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
         }
-        h2 { margin: 0; font-weight: 600; font-size: 24px; }
-        p.subtitle { color: #9ca3af; font-size: 14px; margin: 10px 0 30px; }
-        
-        .input-group { position: relative; margin-bottom: 15px; }
-        input { 
-            width: 100%; 
-            padding: 15px; 
-            border-radius: 14px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            background: rgba(0, 0, 0, 0.3); 
-            color: white; 
-            outline: none;
-            font-size: 16px;
+
+        h2 { margin: 0 0 8px; font-weight: 600; font-size: 24px; letter-spacing: 0.5px; }
+        p { color: #9ca3af; font-size: 14px; margin-bottom: 30px; }
+
+        .flash-msg {
+            background: rgba(255, 77, 77, 0.1);
+            color: #ff4d4d;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 77, 77, 0.2);
         }
-        input:focus { border-color: var(--accent-purple); }
-        
+
+        .input-group { margin-bottom: 15px; text-align: left; position: relative; }
+        input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 20px;
+            border-radius: 14px;
+            color: white; outline: none;
+            font-size: 15px; transition: 0.3s;
+        }
+        input:focus { border-color: #7c3aed; background: rgba(255, 255, 255, 0.08); }
+
+        /* 🔥 EYE ICON STYLE */
         .toggle-password {
             position: absolute;
             right: 15px;
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            color: var(--accent-purple);
+            color: #9ca3af;
+            font-size: 18px;
+            background: none;
+            border: none;
+            padding: 5px;
         }
 
-        button { 
-            width: 100%; 
-            padding: 15px; 
-            border-radius: 14px; 
-            border: none; 
-            background: #7c3aed; 
-            color: white; 
-            font-weight: 600; 
-            font-size: 16px;
-            cursor: pointer; 
-            margin-top: 10px;
+        .btn-primary {
+            width: 100%;
+            background: #7c3aed;
+            color: white; border: none;
+            padding: 14px; border-radius: 14px;
+            font-size: 16px; font-weight: 600;
+            cursor: pointer; margin-top: 10px;
+            transition: 0.3s;
         }
-        .flash { color: #ef4444; font-size: 13px; margin-bottom: 15px; background: rgba(239,68,68,0.1); padding: 8px; border-radius: 8px; }
-        .links { margin-top: 20px; font-size: 14px; color: #9ca3af; }
-        a { color: #d8b4fe; text-decoration: none; font-weight: 600; }
+        .btn-primary:hover { background: #6d28d9; transform: translateY(-2px); }
+
+        .footer-text { margin-top: 25px; font-size: 13px; color: #6b7280; }
+        .footer-text a { color: #d8b4fe; text-decoration: none; font-weight: 600; }
     </style>
 </head>
 <body>
-    <div class="register-card">
-        <div class="mini-orb"></div>
-        <h2>New Protocol</h2>
-        <p class="subtitle">Initialize User Identity</p>
-        
+
+    <div class="auth-card">
+        <div class="orb-icon"></div>
+        <h2>Initialize Identity</h2>
+        <p>Create a new protocol for J.A.R.V.I.S.</p>
+
         {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            {% for message in messages %}
-              <div class="flash">{{ message }}</div>
-            {% endfor %}
-          {% endif %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash-msg">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
         {% endwith %}
 
-        <form method="POST">
+        <form action="/register" method="POST">
             <div class="input-group">
-                <input type="email" name="email" placeholder="Email Address" required autocomplete="off">
+                <input type="text" name="username" placeholder="Full Name" required>
             </div>
             <div class="input-group">
-                <input type="text" name="username" placeholder="Your Name (e.g. Raunak)" required autocomplete="off">
+                <input type="email" name="email" placeholder="Email Address" required>
             </div>
             <div class="input-group">
-                <input type="password" name="password" id="regPass" placeholder="Create Passcode (Min 6)" required>
-                <span class="toggle-password" onclick="toggleRegPass()">👁️</span>
+                <input type="password" id="password" name="password" placeholder="Set Passcode" required>
+                <button type="button" class="toggle-password" onclick="togglePass()">👁️</button>
             </div>
-            <button type="submit">Initialize Identity</button>
+            <button type="submit" class="btn-primary">Create Identity</button>
         </form>
-        <div class="links">
-            Already verified? <a href="/login">Login here</a>
+
+        <div class="footer-text">
+            Already have a protocol? <a href="/login">Verify here</a>
         </div>
     </div>
 
     <script>
-        function toggleRegPass() {
-            const p = document.getElementById('regPass');
-            const icon = document.querySelector('.toggle-password');
-            if (p.type === "password") {
-                p.type = "text";
-                icon.innerText = "🙈";
+        // 🔥 JavaScript to Toggle Password
+        function togglePass() {
+            const passInput = document.getElementById('password');
+            const toggleBtn = document.querySelector('.toggle-password');
+            
+            if (passInput.type === "password") {
+                passInput.type = "text";
+                toggleBtn.innerText = "🔒"; // Hide icon
             } else {
-                p.type = "password";
-                icon.innerText = "👁️";
+                passInput.type = "password";
+                toggleBtn.innerText = "👁️"; // View icon
             }
         }
     </script>
+
 </body>
 </html>
