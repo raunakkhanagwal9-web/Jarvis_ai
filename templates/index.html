@@ -59,6 +59,23 @@
             gap: 12px; /* Clean message spacing */
             scroll-behavior: smooth;
         }
+        <button onclick="clearHistory()" style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px; border-radius: 12px; width: 100%; cursor: pointer; font-size: 13px; margin-top: 10px; font-weight: 600;">
+    🗑️ Clear History
+</button>
+
+<script>
+// Is function ko script tag ke andar sabse niche add kar do
+async function clearHistory() {
+    if(confirm("Sir, are you sure? Sab kuch delete ho jayega.")) {
+        const res = await fetch('/delete_history', { method: 'POST' });
+        const data = await res.json();
+        if(data.status === "success") {
+            location.reload(); // Page refresh karke sidebar saaf kar dega
+        }
+    }
+}
+</script>
+        
 
         /* --- Welcome UI (Original Layout) --- */
         #main-ui { text-align: center; padding-top: 60px; display: flex; flex-direction: column; }
