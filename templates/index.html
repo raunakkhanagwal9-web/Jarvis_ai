@@ -3,59 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>J.A.R.V.I.S. | Personal AI</title>
+    <title>J.A.R.V.I.S.</title>
     <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
     <style>
         * { box-sizing: border-box; }
-        :root {
-            --bg-gradient: radial-gradient(circle at top, #1a1025 0%, #050505 100%);
-        }
         body {
             margin: 0; padding: 0;
-            height: 100dvh; overflow: hidden;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #050505; color: white;
+            height: 100dvh; background: radial-gradient(circle at top, #1a1025 0%, #050505 100%);
+            color: white; font-family: -apple-system, sans-serif; overflow: hidden;
         }
 
-        /* --- Old Sidebar Layout --- */
-        .sidebar {
-            position: fixed; left: -280px; top: 0; width: 280px; height: 100%;
-            background: rgba(10, 10, 10, 0.95); backdrop-filter: blur(20px);
-            z-index: 1000; transition: 0.3s ease;
-            padding: 20px; display: flex; flex-direction: column;
-        }
+        /* --- Sidebar --- */
+        .sidebar { position: fixed; left: -280px; top: 0; width: 280px; height: 100%; background: rgba(10,10,10,0.95); backdrop-filter: blur(20px); z-index: 1000; transition: 0.3s; padding: 20px; display: flex; flex-direction: column; }
         .sidebar.active { left: 0; }
-        .menu-btn { position: absolute; top: 15px; left: 15px; z-index: 1001; background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .menu-btn { position: absolute; top: 15px; left: 15px; background: none; border: none; color: white; font-size: 24px; cursor: pointer; z-index: 1001; }
 
-        .new-chat-btn { background: #7c3aed; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 40px; }
-        .history-list { flex: 1; overflow-y: auto; margin-top: 20px; }
-        .history-item { padding: 10px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 8px; font-size: 13px; cursor: pointer; }
-        
-        .del-history-btn { background: none; border: 1px solid rgba(255, 77, 77, 0.3); color: #ff4d4d; padding: 10px; border-radius: 10px; cursor: pointer; font-size: 12px; margin-top: 10px; }
+        /* --- Chat Box --- */
+        .chat-box { height: 100%; overflow-y: auto; padding: 20px; padding-top: 60px; padding-bottom: 100px; display: flex; flex-direction: column; gap: 15px; }
 
-        /* --- Chat Layout --- */
-        .container { display: flex; flex-direction: column; height: 100%; background: var(--bg-gradient); }
-        .chat-box { flex: 1; overflow-y: auto; padding: 20px; padding-top: 60px; display: flex; flex-direction: column; gap: 15px; }
-
-        /* --- Welcome UI (Purana Wala) --- */
-        #main-ui { text-align: center; padding-top: 40px; }
-        .orb { width: 80px; height: 80px; background: radial-gradient(circle, #d8b4fe 0%, #a855f7 100%); border-radius: 50%; margin: 0 auto 20px; filter: blur(1px); box-shadow: 0 0 30px rgba(168, 85, 247, 0.5); }
-        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        /* --- Original Welcome UI --- */
+        #main-ui { text-align: center; margin-top: 40px; }
+        .orb { width: 90px; height: 90px; background: radial-gradient(circle, #d8b4fe 0%, #a855f7 100%); border-radius: 50%; margin: 0 auto 20px; filter: blur(2px); box-shadow: 0 0 40px rgba(168, 85, 247, 0.4); }
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 400px; margin: 20px auto; }
         .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 15px; padding: 15px; font-size: 13px; text-align: left; }
 
         /* --- Messages --- */
-        .message { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 15.5px; line-height: 1.6; word-wrap: break-word; animation: fadeIn 0.2s ease; }
-        .bot { background: rgba(255, 255, 255, 0.08); align-self: flex-start; border-bottom-left-radius: 4px; }
-        .user { background: #7c3aed; align-self: flex-end; border-bottom-right-radius: 4px; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .message { max-width: 85%; padding: 12px 16px; border-radius: 18px; line-height: 1.6; font-size: 15.5px; animation: fadeIn 0.2s ease; }
+        .user { align-self: flex-end; background: #7c3aed; border-bottom-right-radius: 4px; }
+        .bot { align-self: flex-start; background: rgba(255,255,255,0.08); border-bottom-left-radius: 4px; }
 
-        /* --- Input --- */
-        .input-area { padding: 15px; background: #050505; }
-        .input-wrapper { background: rgba(255,255,255,0.1); border-radius: 25px; display: flex; padding: 5px 15px; border: 1px solid rgba(255,255,255,0.1); }
-        input { flex: 1; background: none; border: none; color: white; padding: 10px; outline: none; font-size: 16px; }
-        .send-btn { background: none; border: none; color: #d8b4fe; font-weight: 600; cursor: pointer; }
+        /* --- Original Floating Search Bar --- */
+        .input-area { position: fixed; bottom: 30px; width: 100%; padding: 0 20px; z-index: 10; }
+        .input-wrapper { background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); border-radius: 30px; display: flex; padding: 5px 15px; border: 1px solid rgba(255,255,255,0.15); max-width: 600px; margin: 0 auto; }
+        input { flex: 1; background: none; border: none; color: white; padding: 12px; outline: none; font-size: 16px; }
+        .send-btn { background: none; border: none; color: #d8b4fe; font-weight: 600; cursor: pointer; padding-left: 10px; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -63,44 +47,41 @@
     <button class="menu-btn" onclick="toggleSidebar()">☰</button>
     
     <div class="sidebar" id="sidebar">
-        <button class="new-chat-btn" onclick="location.reload()">+ New Chat</button>
-        <div class="history-list" id="historyList">
+        <button style="background:#7c3aed; border:none; color:white; padding:12px; border-radius:10px; margin-top:40px; cursor:pointer;" onclick="location.reload()">+ New Chat</button>
+        <div id="historyList" style="margin-top:20px; flex:1; overflow-y:auto;">
             <h4 style="color: #6b7280; font-size: 11px; text-transform: uppercase;">Recent</h4>
         </div>
-        <button class="del-history-btn" onclick="clearHistory()">🗑️ Clear History</button>
+        <button style="background:none; border:1px solid rgba(255,0,0,0.3); color:#ff4d4d; padding:10px; border-radius:10px; cursor:pointer; font-size:12px;" onclick="clearHistory()">🗑️ Clear History</button>
     </div>
 
-    <div class="container">
-        <div class="chat-box" id="chatBox">
-            <div id="main-ui">
-                <div class="orb"></div>
-                <h2 style="font-weight: 400;">Hey, {{ name }}</h2>
-                <p style="color: #9ca3af; font-size: 14px;">How can I help you today?</p>
-                <div class="grid-container">
-                    <div class="card">🖼️ Generate AI Images</div>
-                    <div class="card">🎥 Create AI Videos</div>
-                    <div class="card">📂 Analyze Documents</div>
-                    <div class="card">✍️ Write Better Emails</div>
-                </div>
+    <div class="chat-box" id="chatBox">
+        <div id="main-ui">
+            <div class="orb"></div>
+            <h2 style="font-weight: 400; margin-bottom: 5px;">Hey, {{ name }}</h2>
+            <p style="color: #9ca3af; font-size: 14px; margin-bottom: 25px;">How can I help you today?</p>
+            <div class="grid-container">
+                <div class="card">🖼️ Generate AI Images</div>
+                <div class="card">🎥 Create AI Videos</div>
+                <div class="card">📂 Analyze Documents</div>
+                <div class="card">✍️ Write Better Emails</div>
             </div>
         </div>
+    </div>
 
-        <div class="input-area">
-            <div class="input-wrapper">
-                <input type="text" id="userInput" placeholder="Ask J.A.R.V.I.S...">
-                <button class="send-btn" onclick="sendMessage()">SEND</button>
-            </div>
+    <div class="input-area">
+        <div class="input-wrapper">
+            <input type="text" id="userInput" placeholder="Ask J.A.R.V.I.S..." autocomplete="off">
+            <button class="send-btn" onclick="sendMessage()">SEND</button>
         </div>
     </div>
 
     <script>
         const input = document.getElementById('userInput');
         const chatBox = document.getElementById('chatBox');
-        const sidebar = document.getElementById('sidebar');
 
         function toggleSidebar() { 
-            sidebar.classList.toggle('active'); 
-            if(sidebar.classList.contains('active')) loadHistory();
+            document.getElementById('sidebar').classList.toggle('active'); 
+            loadHistory();
         }
 
         async function loadHistory() {
@@ -110,7 +91,7 @@
             list.innerHTML = `<h4 style="color: #6b7280; font-size: 11px; text-transform: uppercase;">Recent</h4>`;
             data.history.forEach(item => {
                 const div = document.createElement('div');
-                div.className = 'history-item';
+                div.style = "padding:10px; background:rgba(255,255,255,0.05); border-radius:8px; margin-bottom:8px; font-size:13px; cursor:pointer;";
                 div.innerText = item.query;
                 div.onclick = () => { input.value = item.query; toggleSidebar(); };
                 list.appendChild(div);
@@ -129,7 +110,6 @@
             if (!query) return;
             document.getElementById('main-ui').style.display = 'none';
 
-            // User Message
             const uDiv = document.createElement('div');
             uDiv.className = 'message user';
             uDiv.innerText = query;
@@ -137,7 +117,6 @@
             input.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            // Bot Placeholder
             const jDiv = document.createElement('div');
             jDiv.className = 'message bot';
             jDiv.innerText = "...";
@@ -150,7 +129,7 @@
             });
             const data = await res.json();
             
-            // 🔥 SUPER FAST REPLY (No typing animation)
+            // FAST REPLY
             jDiv.innerHTML = marked.parse(data.reply);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
@@ -159,3 +138,4 @@
     </script>
 </body>
 </html>
+
