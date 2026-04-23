@@ -4,3 +4,5 @@ Flask-Login
 requests
 gunicorn
 Authlib
+flask-pymongo
+dnspython
