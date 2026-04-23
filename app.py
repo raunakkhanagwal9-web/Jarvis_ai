@@ -14,6 +14,7 @@ app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.config['SECRET_KEY'] = 'jarvis_secret_protocol_777'
 
 # --- ☁️ MONGODB CLOUD SETUP ---
+# Note: Isko baad mein hum Environment Variables mein move karenge security ke liye
 app.config["MONGO_URI"] = "mongodb+srv://raunakkhanagwal9_db_user:52Cqed7w1hCkE4xt@cluster0.czmwhtn.mongodb.net/jarvis_db?retryWrites=true&w=majority&appName=Cluster0"
 mongo = PyMongo(app)
 db = mongo.db.users      
@@ -85,29 +86,28 @@ def google_authorize():
     login_user(User(user_data))
     return redirect(url_for('home'))
 
-# --- 🧠 AI LOGIC (Point 3, 4, 5 Integration) ---
+# --- 🧠 AI LOGIC (Point 1-7 Implementation) ---
 
 @app.route('/ask', methods=['POST'])
 @login_required
 def ask():
     data = request.json
-    query = data.get('query')
+    query = data.get('query').strip()
     
-    # Memory Save
+    # Message database mein save karo
     chat_db.insert_one({"user_id": current_user.id, "query": query})
 
     API_KEY = os.environ.get("GROQ_API_KEY")
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
     
-    # Context (Last 5 chats)
+    # Memory: Last 5 queries for context
     history = list(chat_db.find({"user_id": current_user.id}).sort("_id", -1).limit(5))
     
-    # 🔥 POINT 4: TONE FIX (System Prompt)
     system_prompt = (
-        "You are J.A.R.V.I.S., a friendly and sophisticated AI. Speak naturally like a human. "
-        "Avoid repeating the user's name. Do not use 'Sir' in every sentence—keep it casual but clean. "
-        "Use bullet points (🔹) for structured answers and keep paragraphs airy."
+        "You are J.A.R.V.I.S., a friendly and sophisticated AI. Speak naturally. "
+        "Avoid robotic repetitions. Do not use 'Sir' too much. "
+        "Format long answers with bullet points (🔹) and clean paragraphs."
     )
     
     messages = [{"role": "system", "content": system_prompt}]
@@ -122,23 +122,31 @@ def ask():
         })
         bot_reply = res.json()['choices'][0]['message']['content']
 
-        # 🔥 POINT 3 & 5: STRUCTURED OUTPUT LOGIC
+        # Formatting logic
         if len(bot_reply) > 200:
-            # Paragraph breaks mein bullet points add karna
             bot_reply = bot_reply.replace("\n\n", "\n\n🔹 ")
             if not bot_reply.startswith("🔹"):
                 bot_reply = "🔹 " + bot_reply
 
         return jsonify({'reply': bot_reply})
     except:
-        return jsonify({'reply': "Protocol error. Systems are momentarily unstable."})
+        return jsonify({'reply': "Protocol error, Sir. Connection unstable."})
 
 @app.route('/get_history')
 @login_required
 def get_history():
-    # Sidebar recent chats list
-    history = list(chat_db.find({"user_id": current_user.id}).sort("_id", -1).limit(20))
-    return jsonify({"history": [{"query": h['query']} for h in history]})
+    # Fix: Duplicate messages ko sidebar se hatane ke liye logic
+    history = list(chat_db.find({"user_id": current_user.id}).sort("_id", -1).limit(30))
+    unique_queries = []
+    seen = set()
+    
+    for h in history:
+        clean_q = h['query'].strip()
+        if clean_q not in seen:
+            unique_queries.append({"query": clean_q})
+            seen.add(clean_q)
+            
+    return jsonify({"history": unique_queries[:10]}) # Sirf 10 unique chats dikhao
 
 @app.route('/logout')
 def logout():
@@ -148,4 +156,3 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-    
