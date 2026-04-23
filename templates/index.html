@@ -8,67 +8,107 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
-        /* 🔥 AAPKA ORIGINAL RESET & STYLES (NO CHANGE) */
+        /* 🔥 RESET & FOUNDATION */
         * { box-sizing: border-box; }
+
         :root {
             --bg-gradient: radial-gradient(circle at top, #2a1b3d 0%, #050505 100%);
             --card-bg: rgba(255, 255, 255, 0.05);
         }
+
         html, body {
             margin: 0; padding: 0;
-            height: 100%; height: 100dvh;
+            height: 100dvh;
             overflow: hidden;
             font-family: 'SF Pro Display', -apple-system, sans-serif;
-            background: #050505; color: white;
+            background: #050505;
+            color: white;
         }
 
-        /* 🔥 NEW: SIDEBAR STYLES (Ye aapke design ke upar aayega) */
+        /* 🔥 SIDEBAR (RECENT CHATS) */
         .sidebar {
             position: fixed; left: -280px; top: 0; width: 280px; height: 100%;
             background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(20px);
-            z-index: 1000; transition: 0.3s ease; border-right: 1px solid rgba(255,255,255,0.1);
+            z-index: 1000; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-right: 1px solid rgba(255,255,255,0.1);
             padding: 20px; display: flex; flex-direction: column;
         }
         .sidebar.active { left: 0; }
         .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; }
         .sidebar-overlay.active { display: block; }
-        .menu-btn { position: absolute; top: 15px; left: 15px; z-index: 100; background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
-        .history-item { padding: 12px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 10px; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
-        .new-chat-btn { background: #7c3aed; color: white; border: none; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 40px; }
+        .menu-btn { position: absolute; top: 15px; left: 15px; z-index: 100; background: none; border: none; color: white; font-size: 24px; cursor: pointer; opacity: 0.7; }
+        .new-chat-btn { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; border: none; padding: 12px; border-radius: 12px; margin-bottom: 20px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 40px; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3); }
+        .history-item { padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 8px; font-size: 13px; color: #d1d5db; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* 🔥 AAPKA ORIGINAL CONTAINER */
         .container {
-            display: flex; flex-direction: column;
-            height: 100%; width: 100%;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
             background: var(--bg-gradient);
             position: relative;
         }
 
-        /* CHAT AREA (ORIGINAL) */
-        .chat-box { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
+        /* 🔥 CHAT AREA */
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px; /* Clean message spacing */
+            scroll-behavior: smooth;
+        }
 
-        /* Welcome UI (ORIGINAL) */
+        /* --- Welcome UI (Original Layout) --- */
         #main-ui { text-align: center; padding-top: 60px; display: flex; flex-direction: column; }
-        .orb { width: 90px; height: 90px; background: radial-gradient(circle, #d8b4fe 0%, #a855f7 50%, #6366f1 100%); border-radius: 50%; margin: 0 auto 20px; filter: blur(5px); box-shadow: 0 0 40px rgba(168, 85, 247, 0.6); animation: pulse 4s infinite alternate; }
-        @keyframes pulse { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.1); opacity: 1; box-shadow: 0 0 60px rgba(168, 85, 247, 0.9); } }
+        .orb { width: 90px; height: 90px; background: radial-gradient(circle, #d8b4fe 0%, #a855f7 50%, #6366f1 100%); border-radius: 50%; margin: 0 auto 20px; filter: blur(5px); box-shadow: 0 0 40px rgba(168, 85, 247, 0.6); animation: orbPulse 4s infinite alternate; }
+        @keyframes orbPulse { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.1); opacity: 1; box-shadow: 0 0 60px rgba(168, 85, 247, 0.9); } }
         .welcome-text h2 { margin: 0; font-size: 26px; font-weight: 600; }
         .welcome-text .tagline { font-size: 16px; font-weight: bold; color: white; margin: 8px 0; }
-        .welcome-text p { font-size: 13px; color: #9ca3af; margin: 0 auto; max-width: 250px; line-height: 1.4; }
         .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; margin-bottom: 20px; }
-        .card { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 6px; backdrop-filter: blur(10px); text-align: left; }
-        .card-icon { font-size: 20px; } .card-title { font-weight: 600; font-size: 14px; } .card-desc { font-size: 11px; color: #9ca3af; line-height: 1.3; }
+        .card { background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 6px; backdrop-filter: blur(10px); text-align: left; transition: 0.3s; }
 
-        /* Message Styles (ORIGINAL) */
-        .message { max-width: 85%; padding: 12px 16px; border-radius: 20px; word-wrap: break-word; font-size: 15px; line-height: 1.5; }
-        .bot { background: rgba(255,255,255,0.1); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
-        .user { background: #7c3aed; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        /* --- NEW PRO MESSAGE STYLES --- */
+        .message { 
+            max-width: 85%; 
+            padding: 12px 16px; 
+            border-radius: 18px; 
+            font-size: 15px; 
+            line-height: 1.6; 
+            letter-spacing: 0.2px;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* INPUT AREA (ORIGINAL) */
-        .input-area { flex-shrink: 0; background: #050505; padding: 10px 15px; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+        .bot { 
+            background: rgba(255, 255, 255, 0.08); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            align-self: flex-start; 
+            border-bottom-left-radius: 4px; 
+        }
+        .user { 
+            background: linear-gradient(135deg, #7c3aed, #a855f7); 
+            color: white; 
+            align-self: flex-end; 
+            border-bottom-right-radius: 4px; 
+            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
+        }
+
+        /* 🔥 INPUT AREA (Original Search Bar) */
+        .input-area {
+            flex-shrink: 0;
+            background: #050505;
+            padding: 10px 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: max(10px, env(safe-area-inset-bottom));
+        }
         .input-wrapper { width: 100%; background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(25px); border-radius: 30px; display: flex; align-items: center; padding: 5px 10px 5px 15px; border: 1px solid rgba(255, 255, 255, 0.1); }
         .input-wrapper input { flex: 1; background: transparent; border: none; color: white; padding: 12px 5px; outline: none; font-size: 16px; }
+        .send-text { color: #d8b4fe; font-weight: 600; font-size: 14px; margin-right: 5px; background: none; border: none; cursor: pointer; }
         .icon-btn { background: none; border: none; color: white; cursor: pointer; padding: 8px; font-size: 18px; }
-        .send-text { color: #d8b4fe; font-weight: 600; font-size: 14px; margin-right: 5px; border:none; background:none; }
         .mic-btn { background: #7c3aed; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
     </style>
@@ -79,9 +119,7 @@
     <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
     <div class="sidebar" id="sidebar">
         <button class="new-chat-btn" onclick="location.reload()">+ New Chat</button>
-        <h4 style="color: #9ca3af; margin-bottom: 15px;">Recent Chats</h4>
-        <div id="historyList" style="overflow-y: auto; flex: 1;">
-            </div>
+        <div id="historyList" style="overflow-y: auto; flex: 1;"></div>
     </div>
 
     <div class="container">
@@ -94,10 +132,10 @@
                     <p>Ready to generate image, schedule meetings, or just chat.</p>
                 </div>
                 <div class="grid-container">
-                    <div class="card"><span class="card-icon">🖼️</span><span class="card-title">Generate Image</span><span class="card-desc">Instantly bring ideas to life</span></div>
-                    <div class="card"><span class="card-icon">🎥</span><span class="card-title">Create Video</span><span class="card-desc">Effortless reels with AI</span></div>
-                    <div class="card"><span class="card-icon">📝</span><span class="card-title">Summarise Text</span><span class="card-desc">Essential info in few words</span></div>
-                    <div class="card"><span class="card-icon">📄</span><span class="card-title">CV Builder</span><span class="card-desc">Create your own CV</span></div>
+                    <div class="card"><span class="card-icon">🖼️</span><span class="card-title">Generate Image</span><span class="card-desc">Bring ideas to life</span></div>
+                    <div class="card"><span class="card-icon">🎥</span><span class="card-title">Create Video</span><span class="card-desc">Effortless reels</span></div>
+                    <div class="card"><span class="card-icon">📝</span><span class="card-title">Summarise</span><span class="card-desc">Essential info</span></div>
+                    <div class="card"><span class="card-icon">📄</span><span class="card-title">CV Builder</span><span class="card-desc">Create your CV</span></div>
                 </div>
             </div>
         </div>
@@ -106,7 +144,7 @@
             <div class="input-wrapper">
                 <button class="icon-btn">📷</button>
                 <input type="text" id="userInput" placeholder="Ask J.A.R.V.I.S..." autocomplete="off" />
-                <button class="icon-btn send-text" onclick="sendMessage()">SEND</button>
+                <button class="send-text" onclick="sendMessage()">SEND</button>
                 <button class="icon-btn mic-btn">🎤</button>
             </div>
         </div>
@@ -121,7 +159,6 @@
 
         function scrollToBottom() { chatBox.scrollTop = chatBox.scrollHeight; }
 
-        // Sidebar logic
         function toggleSidebar() {
             sidebar.classList.toggle('active');
             overlay.classList.toggle('active');
@@ -132,7 +169,7 @@
             const res = await fetch('/get_history');
             const data = await res.json();
             const list = document.getElementById('historyList');
-            list.innerHTML = "";
+            list.innerHTML = `<h4 style="color: #9ca3af; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Recent</h4>`;
             data.history.forEach(item => {
                 const div = document.createElement('div');
                 div.className = 'history-item';
@@ -178,13 +215,13 @@
                     if (index <= fullText.length) {
                         jDiv.innerHTML = marked.parse(fullText.substring(0, index));
                         scrollToBottom();
-                        index += 3; 
+                        index += 4; 
                     } else {
                         clearInterval(typer);
                         jDiv.innerHTML = marked.parse(fullText); 
                         scrollToBottom();
                     }
-                }, 15);
+                }, 10);
 
             } catch (e) { jDiv.innerText = "Sir, connection lost."; }
         }
