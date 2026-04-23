@@ -2,165 +2,106 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>J.A.R.V.I.S. | Login</title>
     <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-gradient: radial-gradient(circle at top, #2a1b3d 0%, #050505 100%);
-            --accent-purple: #a855f7;
-            --glass-bg: rgba(255, 255, 255, 0.03);
+        * { box-sizing: border-box; }
+        body {
+            margin: 0; padding: 0;
+            height: 100dvh;
+            display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at top, #1a1025 0%, #050505 100%);
+            font-family: 'SF Pro Display', sans-serif;
+            color: white;
         }
-        body { 
-            background: var(--bg-gradient); 
-            color: white; 
-            font-family: 'SF Pro Display', sans-serif; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100dvh; 
-            margin: 0; 
-            overflow: hidden;
-        }
-        .login-card { 
-            background: var(--glass-bg); 
-            padding: 40px 30px; 
-            border-radius: 24px; 
-            border: 1px solid rgba(168, 85, 247, 0.3); 
-            text-align: center; 
-            width: 85%;
-            max-width: 400px;
-            backdrop-filter: blur(25px);
+
+        .auth-card {
+            width: 90%; max-width: 380px;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            padding: 40px 30px;
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            text-align: center;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            box-sizing: border-box;
-        }
-        .mini-orb {
-            width: 60px; height: 60px;
-            background: radial-gradient(circle, #d8b4fe 0%, #a855f7 50%, #6366f1 100%);
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            box-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
-        }
-        h2 { margin: 0; font-weight: 600; font-size: 24px; }
-        p.subtitle { color: #9ca3af; font-size: 14px; margin: 10px 0 30px; }
-        
-        .input-group { position: relative; margin-bottom: 15px; }
-        input { 
-            width: 100%; 
-            padding: 15px; 
-            border-radius: 14px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            background: rgba(0, 0, 0, 0.3); 
-            color: white; 
-            outline: none;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        input:focus { border-color: var(--accent-purple); }
-        
-        .toggle-password {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: var(--accent-purple);
         }
 
-        button.main-btn { 
-            width: 100%; 
-            padding: 15px; 
-            border-radius: 14px; 
-            border: none; 
-            background: #7c3aed; 
-            color: white; 
-            font-weight: 600; 
-            font-size: 16px;
-            cursor: pointer; 
-            margin-top: 10px;
-            box-sizing: border-box;
+        .orb-icon {
+            width: 70px; height: 70px;
+            background: radial-gradient(circle, #a855f7 0%, #6366f1 100%);
+            border-radius: 50%; margin: 0 auto 20px;
+            filter: blur(2px); box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
         }
-        .flash { color: #ef4444; font-size: 13px; margin-bottom: 15px; background: rgba(239,68,68,0.1); padding: 8px; border-radius: 8px; }
-        
-        .divider {
-            margin-top: 20px; 
-            border-top: 1px solid rgba(255,255,255,0.1); 
-            padding-top: 20px;
+
+        h2 { margin: 0 0 8px; font-weight: 600; font-size: 24px; letter-spacing: 0.5px; }
+        p { color: #9ca3af; font-size: 14px; margin-bottom: 30px; }
+
+        /* Flash messages logic */
+        .flash-msg {
+            background: rgba(255, 77, 77, 0.1);
+            color: #ff4d4d; padding: 12px; border-radius: 12px;
+            font-size: 13px; margin-bottom: 20px; border: 1px solid rgba(255, 77, 77, 0.2);
         }
-        
+
+        .input-group { margin-bottom: 15px; text-align: left; position: relative; }
+        input {
+            width: 100%; background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px 20px; border-radius: 14px;
+            color: white; outline: none; font-size: 15px; transition: 0.3s;
+        }
+        input:focus { border-color: #7c3aed; background: rgba(255, 255, 255, 0.08); }
+
+        .btn-primary {
+            width: 100%; background: #7c3aed; color: white; border: none;
+            padding: 14px; border-radius: 14px; font-size: 16px; font-weight: 600;
+            cursor: pointer; margin-top: 10px; transition: 0.3s;
+        }
+        .btn-primary:hover { background: #6d28d9; transform: translateY(-2px); }
+
         .google-btn {
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            background: white; 
-            color: black; 
-            padding: 12px; 
-            border-radius: 14px; 
-            font-weight: 600; 
-            text-decoration: none; 
-            transition: 0.3s; 
-            box-shadow: 0 4px 15px rgba(255,255,255,0.1);
+            width: 100%; background: white; color: #1a1a1a; border: none;
+            padding: 12px; border-radius: 14px; font-size: 15px; font-weight: 600;
+            margin-top: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-
-        .links { margin-top: 20px; font-size: 14px; color: #9ca3af; }
-        a { color: #d8b4fe; text-decoration: none; font-weight: 600; }
     </style>
 </head>
 <body>
-    <div class="login-card">
-        <div class="mini-orb"></div>
-        <h2>Verify Identity</h2>
-<p style="color: #9ca3af; font-size: 14px; margin-bottom: 20px;">Access J.A.R.V.I.S. Protocol</p>
-        
-        {% with messages = get_flashed_messages() %}
-  {% if messages %}
-    {% for message in messages %}
-      <div style="color: #ff4d4d; font-size: 13px; margin-bottom: 10px; padding: 10px; background: rgba(255, 77, 77, 0.1); border-radius: 8px; border: 1px solid rgba(255, 77, 77, 0.2);">
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
-        
 
-<h2 style="margin-bottom: 5px;">Welcome Back, Sir</h2>
-<p style="color: #9ca3af; font-size: 14px; margin-bottom: 20px;">Verify Identity to access J.A.R.V.I.S.</p>
-        
-        <form method="POST">
+    <div class="auth-card">
+        <div class="orb-icon"></div>
+        <h2>Verify Identity</h2>
+        <p>Access J.A.R.V.I.S. Protocol</p>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash-msg">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form action="/login" method="POST">
             <div class="input-group">
-                <input type="email" name="email" placeholder="Email Address" required autocomplete="off">
+                <input type="email" name="email" placeholder="Email Address" required>
             </div>
             <div class="input-group">
-                <input type="password" name="password" id="logPass" placeholder="Passcode" required>
-                <span class="toggle-password" onclick="toggleLogPass()">👁️</span>
+                <input type="password" name="password" placeholder="Passcode" required>
             </div>
-            <button type="submit" class="main-btn">Verify Identity</button>
+            <button type="submit" class="btn-primary">Verify Identity</button>
         </form>
 
-        <div class="divider">
-            <a href="/login/google" class="google-btn">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" style="width: 20px; margin-right: 10px;">
-                Continue with Google
-            </a>
-        </div>
+        <button onclick="window.location.href='/login/google'" class="google-btn">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
+            Continue with Google
+        </button>
 
-        <div class="links">
-            No access yet? <a href="/register">Initialize here</a>
-        </div>
+        <p style="margin-top: 25px; font-size: 13px; color: #6b7280;">
+            No access yet? <a href="/register" style="color: #d8b4fe; text-decoration: none; font-weight: 600;">Initialize here</a>
+        </p>
     </div>
 
-    <script>
-        function toggleLogPass() {
-            const p = document.getElementById('logPass');
-            const icon = document.querySelector('.toggle-password');
-            if (p.type === "password") {
-                p.type = "text";
-                icon.innerText = "🙈";
-            } else {
-                p.type = "password";
-                icon.innerText = "👁️";
-            }
-        }
-    </script>
 </body>
 </html>
+
