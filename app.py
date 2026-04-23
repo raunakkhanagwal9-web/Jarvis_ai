@@ -9,16 +9,15 @@ import os
 from authlib.integrations.flask_client import OAuth
 
 app = Flask(__name__)
-# Render/Proxy support ke liye
+# Render support ke liye
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.config['SECRET_KEY'] = 'jarvis_secret_protocol_777'
 
 # --- ☁️ MONGODB CLOUD SETUP ---
-# Aapka permanent connection link
 app.config["MONGO_URI"] = "mongodb+srv://raunakkhanagwal9_db_user:52Cqed7w1hCkE4xt@cluster0.czmwhtn.mongodb.net/jarvis_db?retryWrites=true&w=majority&appName=Cluster0"
 mongo = PyMongo(app)
-db = mongo.db.users      # Users table
-chat_db = mongo.db.chats # History table
+db = mongo.db.users      
+chat_db = mongo.db.chats 
 
 # --- 🔐 LOGIN MANAGER ---
 login_manager = LoginManager(app)
@@ -61,11 +60,8 @@ def login():
         email = request.form.get('email').strip()
         password = request.form.get('password').strip()
         user_data = db.find_one({"email": email})
-        
-        if not user_data:
-            flash('User not found, Sir.')
-        elif not check_password_hash(user_data['password'], password):
-            flash('Invalid passcode, Sir.')
+        if not user_data or not check_password_hash(user_data['password'], password):
+            flash('Invalid credentials, Sir.')
         else:
             login_user(User(user_data))
             return redirect(url_for('home'))
@@ -80,43 +76,16 @@ def google_login():
 def google_authorize():
     token = google.authorize_access_token()
     user_info = token.get('userinfo')
-    if not user_info:
-        user_info = google.get('https://openidconnect.googleapis.com/v1/userinfo').json()
-    
     email = user_info.get('email')
-    name = user_info.get('name', 'Jarvis User')
-
     user_data = db.find_one({"email": email})
     if not user_data:
-        new_user = {
-            "email": email,
-            "username": name,
-            "password": generate_password_hash("google_bypass", method='pbkdf2:sha256')
-        }
+        new_user = {"email": email, "username": user_info.get('name'), "password": generate_password_hash("google_bypass")}
         user_id = db.insert_one(new_user).inserted_id
         user_data = db.find_one({"_id": user_id})
-    
     login_user(User(user_data))
     return redirect(url_for('home'))
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        email = request.form.get('email').strip()
-        username = request.form.get('username').strip()
-        password = request.form.get('password').strip()
-        
-        if db.find_one({"email": email}):
-            flash('Email already registered, Sir.')
-            return redirect(url_for('register'))
-            
-        hashed_pw = generate_password_hash(password, method='pbkdf2:sha256')
-        db.insert_one({"email": email, "username": username, "password": hashed_pw})
-        flash('Registration successful! Please login.')
-        return redirect(url_for('login'))
-    return render_template('register.html')
-
-# --- 🧠 AI LOGIC WITH MEMORY ---
+# --- 🧠 AI LOGIC (Point 3, 4, 5 Integration) ---
 
 @app.route('/ask', methods=['POST'])
 @login_required
@@ -124,46 +93,52 @@ def ask():
     data = request.json
     query = data.get('query')
     
-    # 1. User ki query save karo database mein
-    chat_db.insert_one({
-        "user_id": current_user.id,
-        "query": query,
-        "role": "user"
-    })
-
-    # 2. Purani history nikalna context ke liye (Last 5 chats)
-    past_chats = list(chat_db.find({"user_id": current_user.id}).sort("_id", -1).limit(6))
-    
-    messages = [{"role": "system", "content": f"You are J.A.R.V.I.S., a highly advanced AI. User is {current_user.username} Sir. Be polite and efficient."}]
-    
-    # History ko sahi order mein lagana
-    for chat in reversed(past_chats):
-        messages.append({"role": "user", "content": chat['query']})
+    # Memory Save
+    chat_db.insert_one({"user_id": current_user.id, "query": query})
 
     API_KEY = os.environ.get("GROQ_API_KEY")
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
     
-    payload = {
-        "model": "llama-3.3-70b-versatile",
-        "messages": messages,
-        "temperature": 0.7
-    }
+    # Context (Last 5 chats)
+    history = list(chat_db.find({"user_id": current_user.id}).sort("_id", -1).limit(5))
     
+    # 🔥 POINT 4: TONE FIX (System Prompt)
+    system_prompt = (
+        "You are J.A.R.V.I.S., a friendly and sophisticated AI. Speak naturally like a human. "
+        "Avoid repeating the user's name. Do not use 'Sir' in every sentence—keep it casual but clean. "
+        "Use bullet points (🔹) for structured answers and keep paragraphs airy."
+    )
+    
+    messages = [{"role": "system", "content": system_prompt}]
+    for h in reversed(history):
+        messages.append({"role": "user", "content": h['query']})
+
     try:
-        res = requests.post(url, headers=headers, json=payload)
+        res = requests.post(url, headers=headers, json={
+            "model": "llama-3.3-70b-versatile", 
+            "messages": messages,
+            "temperature": 0.7
+        })
         bot_reply = res.json()['choices'][0]['message']['content']
+
+        # 🔥 POINT 3 & 5: STRUCTURED OUTPUT LOGIC
+        if len(bot_reply) > 200:
+            # Paragraph breaks mein bullet points add karna
+            bot_reply = bot_reply.replace("\n\n", "\n\n🔹 ")
+            if not bot_reply.startswith("🔹"):
+                bot_reply = "🔹 " + bot_reply
+
         return jsonify({'reply': bot_reply})
-    except Exception as e:
-        return jsonify({'reply': "Protocol error, Sir. Check API Connection."})
+    except:
+        return jsonify({'reply': "Protocol error. Systems are momentarily unstable."})
 
 @app.route('/get_history')
 @login_required
 def get_history():
-    # Sidebar ke liye last 20 queries nikalna
+    # Sidebar recent chats list
     history = list(chat_db.find({"user_id": current_user.id}).sort("_id", -1).limit(20))
-    formatted_history = [{"query": h['query']} for h in history]
-    return jsonify({"history": formatted_history})
+    return jsonify({"history": [{"query": h['query']} for h in history]})
 
 @app.route('/logout')
 def logout():
@@ -171,7 +146,6 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == "__main__":
-    # Render port handle karne ke liye
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
     
