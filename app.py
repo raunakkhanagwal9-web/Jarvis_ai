@@ -9,7 +9,7 @@ import os
 from authlib.integrations.flask_client import OAuth
 
 app = Flask(__name__)
-# Render & Proxy support
+# Render & Proxy support (Zaroori hai HTTPS ke liye)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 app.config['SECRET_KEY'] = 'jarvis_secret_protocol_777'
 
@@ -67,6 +67,32 @@ def login():
             return redirect(url_for('home'))
     return render_template('login.html')
 
+# 🔥 GOOGLE LOGIN ROUTES (FIXED)
+@app.route('/login/google')
+def google_login():
+    redirect_uri = url_for('google_authorize', _external=True, _scheme='https')
+    return google.authorize_redirect(redirect_uri)
+
+@app.route('/login/google/authorize')
+def google_authorize():
+    token = google.authorize_access_token()
+    user_info = token.get('userinfo')
+    email = user_info.get('email')
+    
+    user_data = db.find_one({"email": email})
+    if not user_data:
+        # Naya user agar Google se aaye
+        new_user = {
+            "email": email, 
+            "username": user_info.get('name'), 
+            "password": generate_password_hash("google_bypass_777")
+        }
+        user_id = db.insert_one(new_user).inserted_id
+        user_data = db.find_one({"_id": user_id})
+    
+    login_user(User(user_data))
+    return redirect(url_for('home'))
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -81,36 +107,26 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html')
 
-# --- 🧠 AI LOGIC (FAST & HUMAN-LIKE) ---
+# --- 🧠 AI LOGIC ---
 
 @app.route('/ask', methods=['POST'])
 @login_required
 def ask():
     data = request.json
     query = data.get('query', '').strip()
-    
-    if not query:
-        return jsonify({'reply': "I'm listening, Sir."})
+    if not query: return jsonify({'reply': "Listening..."})
 
-    # Save to Database
     chat_db.insert_one({"user_id": current_user.id, "query": query})
-
     API_KEY = os.environ.get("GROQ_API_KEY")
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
     
-    # Context (Last 5 chats)
     history_data = list(chat_db.find({"user_id": current_user.id}).sort("_id", -1).limit(6))
     
-    # 🔥 RAUNAK'S PRO SYSTEM PROMPT
     system_prompt = """
-    You are a highly intelligent AI assistant named J.A.R.V.I.S.
-    Reply like a real human — natural, clear, and helpful.
-    - If user speaks Hindi/Hinglish, you MUST respond in Hinglish.
-    - Keep responses smooth and conversational. 
-    - Avoid robotic greetings or repeating "Aur kuch help chahiye?".
-    - Never summarize the user's question. Go straight to the answer.
-    - Use short paragraphs and spacing.
+    You are J.A.R.V.I.S., a smart AI friend. 
+    Respond in Hinglish naturally. Don't be robotic. 
+    Keep it conversational and clean.
     """
     
     messages = [{"role": "system", "content": system_prompt}]
@@ -121,17 +137,13 @@ def ask():
         res = requests.post(url, headers=headers, json={
             "model": "llama-3.3-70b-versatile", 
             "messages": messages,
-            "temperature": 0.6, # Low temp = Fast & Precise
+            "temperature": 0.6,
             "max_tokens": 500
         })
         bot_reply = res.json()['choices'][0]['message']['content']
-
-        # Clean Formatting
-        bot_reply = bot_reply.replace(". ", ".\n\n").replace("! ", "!\n\n").replace("? ", "?\n\n")
-        
         return jsonify({'reply': bot_reply.strip()})
     except:
-        return jsonify({'reply': "Neural link error, Sir. Connection unstable."})
+        return jsonify({'reply': "Neural link unstable, Sir."})
 
 @app.route('/get_history')
 @login_required
@@ -146,15 +158,11 @@ def get_history():
             seen.add(clean_q)
     return jsonify({"history": unique_queries[:10]})
 
-# 🔥 DELETE HISTORY ROUTE
 @app.route('/delete_history', methods=['POST'])
 @login_required
 def delete_history():
-    try:
-        chat_db.delete_many({"user_id": current_user.id})
-        return jsonify({"status": "success"})
-    except:
-        return jsonify({"status": "error", "message": "Failed to clear history"})
+    chat_db.delete_many({"user_id": current_user.id})
+    return jsonify({"status": "success"})
 
 @app.route('/logout')
 def logout():
@@ -164,4 +172,4 @@ def logout():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
-                              
+        
