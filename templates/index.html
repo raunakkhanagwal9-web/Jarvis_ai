@@ -59,22 +59,18 @@
             gap: 12px; /* Clean message spacing */
             scroll-behavior: smooth;
         }
-        <button onclick="clearHistory()" style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 10px; border-radius: 12px; width: 100%; cursor: pointer; font-size: 13px; margin-top: 10px; font-weight: 600;">
-    🗑️ Clear History
-</button>
+        <div class="sidebar" id="sidebar">
+    <button class="new-chat-btn" onclick="location.reload()">+ New Chat</button>
+    
+    <button onclick="clearHistory()" style="background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.2); padding: 12px; border-radius: 12px; width: 100%; cursor: pointer; font-size: 13px; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        🗑️ Clear All History
+    </button>
 
-<script>
-// Is function ko script tag ke andar sabse niche add kar do
-async function clearHistory() {
-    if(confirm("Sir, are you sure? Sab kuch delete ho jayega.")) {
-        const res = await fetch('/delete_history', { method: 'POST' });
-        const data = await res.json();
-        if(data.status === "success") {
-            location.reload(); // Page refresh karke sidebar saaf kar dega
-        }
-    }
-}
-</script>
+    <div id="historyList" style="overflow-y: auto; flex: 1;">
+        <h4 style="color: #9ca3af; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Recent</h4>
+        </div>
+</div>
+        
         
 
         /* --- Welcome UI (Original Layout) --- */
