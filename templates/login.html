@@ -113,13 +113,18 @@
         <p class="subtitle">Verify Identity to access J.A.R.V.I.S.</p>
         
         {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            {% for message in messages %}
-              <div class="flash">{{ message }}</div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
+  {% if messages %}
+    {% for message in messages %}
+      <div style="color: #ff4d4d; background: rgba(255, 77, 77, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 10px; font-size: 13px; border: 1px solid rgba(255, 77, 77, 0.2);">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 
+<h2 style="margin-bottom: 5px;">Welcome Back, Sir</h2>
+<p style="color: #9ca3af; font-size: 14px; margin-bottom: 20px;">Verify Identity to access J.A.R.V.I.S.</p>
+        
         <form method="POST">
             <div class="input-group">
                 <input type="email" name="email" placeholder="Email Address" required autocomplete="off">
